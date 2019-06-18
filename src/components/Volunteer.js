@@ -29,8 +29,6 @@ export default class Volunteer extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            loggingOut:false,
-            addedToMobileUsers:false,
             isModalVisible: false,
             dispatchedVolunteer: false,
             isAccepted: false,
@@ -83,25 +81,9 @@ export default class Volunteer extends Component {
         isAccepted:false,
         isRejected:false,
         });
-    this.setState({addedToMobileUsers:true})
     }
 
-    // deleteFromMobileUsers = () => {
-        // var user = app.auth().currentUser;
-        // var deleteThis = fire2.database().ref(`mobileUsers/Volunteer/${this.state.userUID}`)
-        // deleteThis.remove().then(() => {
-        //     app.auth().signOut().then(function () {
-        //         console.log("SUCCESFULL LOG OUT");
-        //     }).catch(function (error) {
-        //         console.log(error)
-        //     });
-        // })
-    // }
-
     logOut = () => {
-
-        this.setState({loggingOut:true})
-        
         var user = app.auth().currentUser;
         var deleteThis = fire2.database().ref(`mobileUsers/Volunteer/${user.uid}`)
         
@@ -118,31 +100,7 @@ export default class Volunteer extends Component {
                 console.log(error)
             });
         })
-
-    // this.setState({addedToMobileUsers:false});
-    // this.setState({ incidentID: '',
-    //     user:null,
-    //     userId:''
-    //     });
-
-    // app.auth().signOut().then(function () {
-    //     console.log("SUCCESFULL LOG OUT");
-    // }).catch(function (error) {
-    //     console.log(error)
-    // });
     }
-
-    // signOutUser = () => {
-        
-        
-    //     app.auth().signOut().then(function () {
-    //         console.log("SUCCESFULL LOG OUT");
-    //     }).catch(function (error) {
-    //         console.log(error)
-    //     });
-
-    // }
-
 
     authListener() {
         // this._isMounted = true;
@@ -153,7 +111,6 @@ export default class Volunteer extends Component {
                 var userId = this.state.userId
                 this.incidentListener(userId);
                 this.getUserInfo();
-
             }
         });
     }
@@ -168,7 +125,6 @@ export default class Volunteer extends Component {
     }
 
     onBackPress = () => {
-
         //Code to display alert message when use click on android device back button.
         Alert.alert(
             ' Exit From App ',
@@ -179,7 +135,6 @@ export default class Volunteer extends Component {
             ],
             { cancelable: false },
         );
-
         // Return true to enable back button over ride.
         return true;
     }
@@ -334,7 +289,6 @@ export default class Volunteer extends Component {
         let incidentID = this.state.incidentId;
         let userId = this.state.userId;
 
-
         var volunteerListen = app.database().ref(`mobileUsers/Volunteer/${userId}`);
         volunteerListen.update({
             incidentID: "",
@@ -391,6 +345,8 @@ export default class Volunteer extends Component {
                 userId = this.state.userId;
                 var data = snapshot.val();
                 var incidentID = data.incidentID;
+                var isRejected = data.isRejected;
+
                 console.log("incident ID", incidentID);
     
                 if (incidentID !== "") {
@@ -409,6 +365,12 @@ export default class Volunteer extends Component {
                         var volunteerResponding = incidentDetails.volunteerResponding;
                         var isSettled = incidentDetails.isSettled;
                         var isRequestingVolunteers = incidentDetails.isRequestingVolunteers;
+
+                        if(isRejected){
+                            volunteerListen.update({
+                                isRejected: false,
+                            });
+                        }
     
                         if (incidentID && volunteerResponding === "" && isSettled === false) {
                             Alert.alert(
@@ -535,13 +497,9 @@ export default class Volunteer extends Component {
 
     componentDidMount() {
         this._isMounted = true;
-        this.setState({loggingOut:false})
         
         this.authListener();
         this.addToMobileUsers();
-        // if(!this.state.addedToMobileUsers){
-        //     this.addToMobileUsers();
-        // }
 
         Geolocation.getCurrentPosition(
 

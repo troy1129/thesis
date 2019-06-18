@@ -49,7 +49,6 @@ export default class Responder extends Component {
         this.getImage = this.getImage.bind(this)
 
         this.state = {
-            addedToMobileUsers:false,
             isFeedback:false,
             isArrived:false,
             isShown:false,
@@ -128,53 +127,38 @@ export default class Responder extends Component {
 
     }
 
-    // addToMobileUsers = () => {
-    //     let user = app.auth().currentUser;
-    //     var addThis = app.database().ref(`mobileUsers/Responder/${user.uid}`)
-    //     addThis.set({
-    //         incidentID:"",
-    //         isAccepted:false,
-    //         });
-    //     this.setState({addedToMobileUsers:true})
-    //     }
-
+    addToMobileUsers = () => {
+        let user = app.auth().currentUser;
+        var addThis = app.database().ref(`mobileUsers/Responder/${user.uid}`)
+        addThis.update({
+            incidentID:"",
+            isAccepted:false,
+            });
+        }
 
     signOutUser = () => {
+        var user = app.auth().currentUser;
+        var deleteThis = fire2.database().ref(`mobileUsers/Responder/${user.uid}`)
+        
+        this.user2 = app.database().ref(`users/${user.uid}/`);
+        this.responderListen = app.database().ref(`mobileUsers/Responder/${user.uid}`);
+     
+        this.user2.off();
+        this.responderListen.off();
 
-        // this.setState({ incidentID: '',
-        // user:null,
-        // userId:''
-        // });
+        deleteThis.remove().then(() => {
+            app.auth().signOut().then(() => {
+                console.log("SUCCESFULL LOG OUT");
+            }).catch(function (error) {
+                console.log(error)
+            });
+        })
 
         // app.auth().signOut().then(function () {
         //     console.log("SUCCESFULL LOG OUT");
         // }).catch(function (error) {
         //     console.log(error)
         // });
-
-        app.auth().signOut().then(function () {
-            console.log("SUCCESFULL LOG OUT");
-        }).catch(function (error) {
-            console.log(error)
-        });
-
-    //     this.responderListen.off();
-    //     var user = app.auth().currentUser;
-    //     var deleteThis = fire2.database().ref(`mobileUsers/Responder/${user.uid}`)
-    //     deleteThis.remove().then(() => {
-    //         app.auth().signOut().then(function () {
-    //             console.log("SUCCESFULL LOG OUT");
-    //         }).catch(function (error) {
-    //             console.log(error)
-    //         });
-    //     })
-
-    // this.setState({addedToMobileUsers:false});
-    // this.setState({ incidentID: '',
-    //     user:null,
-    //     userId:''
-    //     });
-
     }
 
     getImage(){
@@ -263,11 +247,6 @@ export default class Responder extends Component {
             }
 
             that.setState({ userType, firstName, lastName });
-            // app.database().ref(`mobileUsers/Responder/${that.state.userId}`).update({
-            //     incidentID: '',
-            //     isAccepted: false,
-            // })
-
         })
 
 
@@ -328,17 +307,6 @@ export default class Responder extends Component {
         let userId = this.state.userId;
         console.log("is settled?", incidentID, userId);
 
-        // this.setState({
-        //     isSettled: false,
-        //     dispatchedResponder: false,
-        //     isIncidentReady: false,
-        //     originalResponder: false,
-        //     isRequestingResponders: false,
-        //     requestResponders: false,
-        //     incidentId: "",
-        //     isAccepted: false,
-        //    pinUpdate:false
-        // })
         var responderListen = app.database().ref(`mobileUsers/Responder/${userId}`)
         responderListen.update({
             incidentID: '',
@@ -540,11 +508,10 @@ export default class Responder extends Component {
             if (incidentID !== "") {
                 console.log("hey i got here");
                 this.userIncidentId = app.database().ref(`incidents/${incidentID}`);
-                app.database().ref(`mobileUsers/Responder/${that.state.userId}`).update({
-                    incidentID: incidentID,
-                    isAccepted: true,
+                // app.database().ref(`mobileUsers/Responder/${that.state.userId}`).update({
+                //     incidentID: incidentID,
+                // })
 
-                })
                 this.userIncidentId.on('value', (snapshot) => {
                     incidentDetails = snapshot.val() || null;
                     var incidentType = incidentDetails.incidentType;
@@ -678,7 +645,8 @@ export default class Responder extends Component {
                     //     );
                     // }
                     else {
-                        console.log("system is FLAWED")
+                        this.userIncidentId = app.database().ref(`incidents/${incidentID}`);
+                        this.userIncidentId.off();
                     }
                 })
             }
@@ -708,6 +676,7 @@ export default class Responder extends Component {
         this._isMounted = true;
 
         this.authListener();
+        this.addToMobileUsers();
 
         Geolocation.getCurrentPosition(
 
@@ -841,9 +810,6 @@ export default class Responder extends Component {
     componentWillUnmount() {
         this._isMounted = false;
         Geolocation.clearWatch(this.watchId);
-        this.user2.off();
-        this.responderListen.off();
-        this.userIncidentId.off();
     }
 
   
@@ -1285,9 +1251,6 @@ export default class Responder extends Component {
                     {this.state.isSettled === true ? null : polylinemarker}
              
                 </MapView>
-
-                {/* {!this.state.addedToMobileUsers ?
-            this.addToMobileUsers():null} */}
 
                 {!this.state.isIncidentReady ? null :
 

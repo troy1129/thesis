@@ -30,7 +30,6 @@ export default class Volunteer extends Component {
         super(props);
         this.state = {
             loggingOut:false,
-            userUID:null,
             addedToMobileUsers:false,
             isModalVisible: false,
             dispatchedVolunteer: false,
@@ -77,9 +76,8 @@ export default class Volunteer extends Component {
     }
 
     addToMobileUsers = () => {
-    // let user = app.auth().currentUser;
-    let user = this.state.userUID;
-    var addThis = app.database().ref(`mobileUsers/Volunteer/${user}`)
+    let user = app.auth().currentUser;
+    var addThis = app.database().ref(`mobileUsers/Volunteer/${user.uid}`)
     addThis.update({
         incidentID:"",
         isAccepted:false,
@@ -106,6 +104,13 @@ export default class Volunteer extends Component {
         
         var user = app.auth().currentUser;
         var deleteThis = fire2.database().ref(`mobileUsers/Volunteer/${user.uid}`)
+        
+        this.user2 = app.database().ref(`users/${user.uid}/`);
+        this.volunteerListen = app.database().ref(`mobileUsers/Volunteer/${user.uid}`);
+     
+        this.user2.off();
+        this.volunteerListen.off();
+
         deleteThis.remove().then(() => {
             app.auth().signOut().then(() => {
                 console.log("SUCCESFULL LOG OUT");
@@ -149,8 +154,6 @@ export default class Volunteer extends Component {
                 this.incidentListener(userId);
                 this.getUserInfo();
 
-                let uid = app.auth().currentUser.uid;
-                this.setState({userUID:uid});
             }
         });
     }
@@ -501,7 +504,8 @@ export default class Volunteer extends Component {
                             this.getRouteDirection(destinationPlaceId, incidentLocation);
                         }
                         else {
-                            console.log("system is FLAWED")
+                            this.userIncidentId = app.database().ref(`incidents/${incidentID}`);
+                            this.userIncidentId.off();
                         }
                     })
                 }
@@ -589,9 +593,6 @@ export default class Volunteer extends Component {
     componentWillUnmount() {
         this._isMounted = false;
         Geolocation.clearWatch(this.watchId);
-        this.user2.off();
-        this.volunteerListen.off();
-        this.userIncidentId.off();
     }
 
     setIncidentID = () => {

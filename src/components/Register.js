@@ -598,7 +598,7 @@ class Register extends Component {
                         </TouchableOpacity>
                         <TouchableOpacity style={styles.button}
 
-                            onPress={() => { Actions.login() }}>
+                            onPress={() => { Actions.Login() }}>
 
                             <Text style={styles.buttonText}>
                                 Back

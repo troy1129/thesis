@@ -13,7 +13,7 @@ import 'es6-symbol';
 import RadioGroup from 'react-native-radio-buttons-group';
 import apiKey from '../config/apiKey';
 import _ from 'lodash';
-import app , {fire2} from '../config/fire';
+import app, {fire2} from '../config/fire';
 import MapView, { PROVIDER_GOOGLE, Polyline, Marker } from 'react-native-maps';
 import PolyLine from '@mapbox/polyline';
 import ImageView from 'react-native-image-view';
@@ -39,13 +39,12 @@ export default class RegularUser extends Component {
         super(props);
         this.getImage = this.getImage.bind(this)
         this.state = {
-            clearUID:'',
             isModalVisible: false,
             hasResponderAlerted: false,
             hasVolunteerAlerted: false,
             userKey: "",
             userType: '',
-            incidentType: "Vehicular Accident",
+            incidentType: "",
             incidentLocation: "",
             firstName: "",
             lastName: "",
@@ -55,7 +54,7 @@ export default class RegularUser extends Component {
             markerLng: null,
             unresponded: true,
             pinFinal:false,
-            additionalDetails:'',
+            incidentNote:'',
             isResponding: false,
             isSettled: false,
             incidentID: '',
@@ -65,7 +64,6 @@ export default class RegularUser extends Component {
             uploading: false,
             progress: 0,
             incidentUserKey: '',
-            incidentPhoto: '',
             reportedBy: '',
             timeReceived: '',
             timeResponded: '',
@@ -129,6 +127,7 @@ export default class RegularUser extends Component {
         }
         )
     };
+ 
 
     componentWillMount() {
         BackHandler.addEventListener('hardwareBackPress', this.onBackPress);
@@ -170,7 +169,6 @@ export default class RegularUser extends Component {
                 this.setState({ user, userId: user.uid });
                 us = user.uid;
                 this.getUserInfo();
-                this.incidentState(this.state.userId);
             }
         });
     }
@@ -208,7 +206,9 @@ export default class RegularUser extends Component {
     componentDidMount() {
 
         this.authListener();
-        this.addToMobileUsers();
+
+      this.addToMobileUsers()
+
 
         Geolocation.getCurrentPosition(
             position => {
@@ -399,7 +399,6 @@ export default class RegularUser extends Component {
 
             if (data2) {
                 responderRespondingID = data2.responderResponding;
-                this.setState({responderRespondingID:data2.responderResponding});
                 // var destinationPlaceId = data2.destinationPlaceId;
                 if (responderRespondingID) {
                     if (that.state.hasResponderAlerted === false) {
@@ -451,7 +450,6 @@ export default class RegularUser extends Component {
 
             if (data2) {
                 volunteerRespondingID = data2.volunteerResponding;
-                this.setState({volunteerRespondingID:data2.volunteerResponding})
 
                 if (volunteerRespondingID) {
                     if (hasVolunteerAlerted === false) {
@@ -482,7 +480,12 @@ export default class RegularUser extends Component {
     componentWillUnmount() {
         this._isMounted = false;
         Geolocation.clearWatch(this.watchId);
-        app.database().ref(`mobileUsers/Regular User/${this.state.clearUID}`).off();
+        this.volunteerListen.off();
+        this.responderListen.off();
+        this.regularUserListen.off();
+        this.user2.off();
+        this.userIncidentId.off();
+        this.incidentIDListen.off();
     }
 
 
@@ -591,6 +594,7 @@ export default class RegularUser extends Component {
 
     submitIncidentHandler = () => {
         var date = Date(Date.now());
+        var fullName = this.state.firstName+''+this.state.lastName;
         date1 = date.toString();
         this.setState({pinFinal:true,isModalVisible: !this.state.isModalVisible,
         })
@@ -601,14 +605,14 @@ export default class RegularUser extends Component {
         app.database().ref("/incidents").push({
             incidentType: this.state.incidentType,
             incidentLocation: this.state.incidentLocation,
-            additionalDetails:this.state.additionalDetails,
+            incidentNote:this.state.incidentNote,
             unresponded: true,
             isResponding: false,
             isSettled: false,
-            incidentPhoto: '',
             markerLat:this.state.markerLat,
             markerLng:this.state.markerLng,
             reportedBy: this.state.userId,
+            reporterName: fullName,
             timeReceived: date1,
             timeResponded: '',
             image_uri: this.state.image_uri,
@@ -621,7 +625,10 @@ export default class RegularUser extends Component {
             destinationPlaceId: this.state.destinationPlaceId,
             isRequestingResponders: false,
             isRequestingVolunteers: false,
-            originalVolunteerName:this.state.originalVolunteerName,
+            requestResponders:'',
+            requestVolunteers:'',
+
+
         }).then((snap) => {
             const incidentUserKey = snap.key;
             this.setState({ incidentUserKey });
@@ -633,7 +640,6 @@ export default class RegularUser extends Component {
             unresponded: null,
             isResponding: null,
             isSettled: null,
-            incidentPhoto: '',
             image_uri: '',
             reportedBy: '',
             timeReceived: '',
@@ -673,25 +679,45 @@ export default class RegularUser extends Component {
     addToMobileUsers = () => {
         let user = app.auth().currentUser;
         var addThis = app.database().ref(`mobileUsers/Regular User/${user.uid}`)
-        addThis.update({
-            incidentID:"",
+        addThis.set({
+            incidentID:""
             });
         }
 
-    signOutUser() {
-        var user = app.auth().currentUser;
-        this.setState({clearUID:user.uid})
-        var deleteThis = fire2.database().ref(`mobileUsers/Regular User/${user.uid}`)
+    signOutUser = () => {
 
-        app.database().ref(`mobileUsers/Regular User/${user.uid}`).off();
-       
-        deleteThis.remove().then(() => {
-            app.auth().signOut().then(() => {
-                console.log("SUCCESFULL LOG OUT");
-            }).catch(function (error) {
-                console.log(error)
-            });
-        })
+        // var adaRef = fire2.database().ref(`mobileUsers/Regular User/${us}`);
+        // adaRef.remove().then(function () {
+        //     console.log("Remove succeeded.")
+        // }).catch(function (error) {
+        //     console.log("Remove failed: " + error.message)
+        // });
+    
+
+        // this.setState({ incidentID: '',
+        // user:null,
+        // userId:''
+        // });
+
+        // var user = app.auth().currentUser;
+        // var deleteThis = fire2.database().ref(`mobileUsers/Regular User/${user.uid}`)
+        // deleteThis.remove().then(() => {
+        //     app.auth().signOut().then(function () {
+        //         console.log("SUCCESFULL LOG OUT");
+        //     }).catch(function (error) {
+        //         console.log(error)
+        //     });
+        // })
+
+        app.auth().signOut().then(function () {
+            // Sign-out successful.
+
+            console.log("SUCCESFULL LOG OUT");
+
+        }).catch(function (error) {
+            // An error happened.
+            console.log(error);
+        });
 
     }
     pressedPrediction(place_id, description) {
@@ -1091,10 +1117,10 @@ export default class RegularUser extends Component {
                     
                     placeholder="Additional Details"
                     style={styles.detailsInput}
-                    onChangeText={additionalDetails => {
-                        this.setState({ additionalDetails });
+                    onChangeText={incidentNote => {
+                        this.setState({ incidentNote });
                     }}
-                    value={this.state.additionalDetails}
+                    value={this.state.incidentNote}
                     multiline
                       />
                     {locationPredictions}

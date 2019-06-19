@@ -29,7 +29,6 @@ export default class Volunteer extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            clearUID:'',
             isModalVisible: false,
             dispatchedVolunteer: false,
             isAccepted: false,
@@ -86,13 +85,14 @@ export default class Volunteer extends Component {
 
     logOut = () => {
         var user = app.auth().currentUser;
-        this.setState({clearUID:user.uid});
         var deleteThis = fire2.database().ref(`mobileUsers/Volunteer/${user.uid}`)
         
-        app.database().ref(`users/${user.uid}/`).off();
-        app.database().ref(`mobileUsers/Volunteer/${user.uid}`).off();
-        
+        this.user2 = app.database().ref(`users/${user.uid}/`);
+        this.volunteerListen = app.database().ref(`mobileUsers/Volunteer/${user.uid}`);
      
+        this.user2.off();
+        this.volunteerListen.off();
+
         deleteThis.remove().then(() => {
             app.auth().signOut().then(() => {
                 console.log("SUCCESFULL LOG OUT");
@@ -105,7 +105,7 @@ export default class Volunteer extends Component {
     authListener() {
         // this._isMounted = true;
         
-        app.auth().onAuthStateChanged(user => {
+        this.fireBaseListener= app.auth().onAuthStateChanged(user => {
             if (user) {
                 this.setState({ user, userId: user.uid });
                 var userId = this.state.userId
@@ -118,10 +118,6 @@ export default class Volunteer extends Component {
 
     componentWillMount() {
         BackHandler.addEventListener('hardwareBackPress', this.onBackPress);
-    }
-
-    componentWillUnmount() {
-        BackHandler.removeEventListener('hardwareBackPress', this.onBackPress);
     }
 
     onBackPress = () => {
@@ -466,7 +462,8 @@ export default class Volunteer extends Component {
                             this.getRouteDirection(destinationPlaceId, incidentLocation);
                         }
                         else {
-                            console.log("system is FLAWED")
+                            this.userIncidentId = app.database().ref(`incidents/${incidentID}`);
+                            this.userIncidentId.off();
                         }
                     })
                 }
@@ -548,10 +545,16 @@ export default class Volunteer extends Component {
 
 
     componentWillUnmount() {
-        this._isMounted = false;
+        BackHandler.removeEventListener('hardwareBackPress', this.onBackPress);
         Geolocation.clearWatch(this.watchId);
-        app.database().ref(`users/${this.state.clearUID}/`).off();
-        app.database().ref(`mobileUsers/Volunteer/${this.state.clearUID}`).off();
+        this.fireBaseListener && this.fireBaseListener();
+        this.user2 = app.database().ref(`users/${this.state.userId}/`);
+        this.responderListen = app.database().ref(`mobileUsers/Responder/${this.state.userId}`);
+        this.userIncidentId = app.database().ref(`incidents/${this.state.incidentID}`);
+        this.user2.off()
+        this.responderListen.off()
+        this.userIncidentId.off()
+        this.authListener = undefined;
     }
 
     setIncidentID = () => {

@@ -13,7 +13,7 @@ import 'es6-symbol';
 import RadioGroup from 'react-native-radio-buttons-group';
 import apiKey from '../config/apiKey';
 import _ from 'lodash';
-import app, {fire2} from '../config/fire';
+import app , {fire2} from '../config/fire';
 import MapView, { PROVIDER_GOOGLE, Polyline, Marker } from 'react-native-maps';
 import PolyLine from '@mapbox/polyline';
 import ImageView from 'react-native-image-view';
@@ -39,12 +39,13 @@ export default class RegularUser extends Component {
         super(props);
         this.getImage = this.getImage.bind(this)
         this.state = {
+            clearUID:'',
             isModalVisible: false,
             hasResponderAlerted: false,
             hasVolunteerAlerted: false,
             userKey: "",
             userType: '',
-            incidentType: "",
+            incidentType: "Vehicular Accident",
             incidentLocation: "",
             firstName: "",
             lastName: "",
@@ -54,7 +55,7 @@ export default class RegularUser extends Component {
             markerLng: null,
             unresponded: true,
             pinFinal:false,
-            incidentNote:'',
+            additionalDetails:'',
             isResponding: false,
             isSettled: false,
             incidentID: '',
@@ -64,6 +65,7 @@ export default class RegularUser extends Component {
             uploading: false,
             progress: 0,
             incidentUserKey: '',
+            incidentPhoto: '',
             reportedBy: '',
             timeReceived: '',
             timeResponded: '',
@@ -163,12 +165,12 @@ export default class RegularUser extends Component {
 
     authListener() {
         this._isMounted = true;
-
         app.auth().onAuthStateChanged(user => {
             if (user) {
                 this.setState({ user, userId: user.uid });
                 us = user.uid;
                 this.getUserInfo();
+                this.incidentState(this.state.userId);
             }
         });
     }
@@ -206,9 +208,7 @@ export default class RegularUser extends Component {
     componentDidMount() {
 
         this.authListener();
-
-        // this.addToMobileUsers()
-
+        this.addToMobileUsers();
 
         Geolocation.getCurrentPosition(
             position => {
@@ -399,6 +399,7 @@ export default class RegularUser extends Component {
 
             if (data2) {
                 responderRespondingID = data2.responderResponding;
+                this.setState({responderRespondingID:data2.responderResponding});
                 // var destinationPlaceId = data2.destinationPlaceId;
                 if (responderRespondingID) {
                     if (that.state.hasResponderAlerted === false) {
@@ -450,6 +451,7 @@ export default class RegularUser extends Component {
 
             if (data2) {
                 volunteerRespondingID = data2.volunteerResponding;
+                this.setState({volunteerRespondingID:data2.volunteerResponding})
 
                 if (volunteerRespondingID) {
                     if (hasVolunteerAlerted === false) {
@@ -480,12 +482,7 @@ export default class RegularUser extends Component {
     componentWillUnmount() {
         this._isMounted = false;
         Geolocation.clearWatch(this.watchId);
-        this.volunteerListen.off();
-        this.responderListen.off();
-        this.regularUserListen.off();
-        this.user2.off();
-        this.userIncidentId.off();
-        this.incidentIDListen.off();
+        app.database().ref(`mobileUsers/Regular User/${this.state.clearUID}`).off();
     }
 
 
@@ -594,7 +591,6 @@ export default class RegularUser extends Component {
 
     submitIncidentHandler = () => {
         var date = Date(Date.now());
-        var fullName = this.state.firstName+''+this.state.lastName;
         date1 = date.toString();
         this.setState({pinFinal:true,isModalVisible: !this.state.isModalVisible,
         })
@@ -605,14 +601,14 @@ export default class RegularUser extends Component {
         app.database().ref("/incidents").push({
             incidentType: this.state.incidentType,
             incidentLocation: this.state.incidentLocation,
-            incidentNote:this.state.incidentNote,
+            additionalDetails:this.state.additionalDetails,
             unresponded: true,
             isResponding: false,
             isSettled: false,
+            incidentPhoto: '',
             markerLat:this.state.markerLat,
             markerLng:this.state.markerLng,
             reportedBy: this.state.userId,
-            reporterName: fullName,
             timeReceived: date1,
             timeResponded: '',
             image_uri: this.state.image_uri,
@@ -625,10 +621,7 @@ export default class RegularUser extends Component {
             destinationPlaceId: this.state.destinationPlaceId,
             isRequestingResponders: false,
             isRequestingVolunteers: false,
-            requestResponders:'',
-            requestVolunteers:'',
-
-
+            originalVolunteerName:this.state.originalVolunteerName,
         }).then((snap) => {
             const incidentUserKey = snap.key;
             this.setState({ incidentUserKey });
@@ -640,6 +633,7 @@ export default class RegularUser extends Component {
             unresponded: null,
             isResponding: null,
             isSettled: null,
+            incidentPhoto: '',
             image_uri: '',
             reportedBy: '',
             timeReceived: '',
@@ -679,46 +673,25 @@ export default class RegularUser extends Component {
     addToMobileUsers = () => {
         let user = app.auth().currentUser;
         var addThis = app.database().ref(`mobileUsers/Regular User/${user.uid}`)
-        addThis.set({
-            incidentID:""
+        addThis.update({
+            incidentID:"",
             });
-        this.setState({addedToMobileUsers:true})
         }
 
-    signOutUser = () => {
+    signOutUser() {
+        var user = app.auth().currentUser;
+        this.setState({clearUID:user.uid})
+        var deleteThis = fire2.database().ref(`mobileUsers/Regular User/${user.uid}`)
 
-        // var adaRef = fire2.database().ref(`mobileUsers/Regular User/${us}`);
-        // adaRef.remove().then(function () {
-        //     console.log("Remove succeeded.")
-        // }).catch(function (error) {
-        //     console.log("Remove failed: " + error.message)
-        // });
-    
-
-        // this.setState({ incidentID: '',
-        // user:null,
-        // userId:''
-        // });
-
-        // var user = app.auth().currentUser;
-        // var deleteThis = fire2.database().ref(`mobileUsers/Regular User/${user.uid}`)
-        // deleteThis.remove().then(() => {
-        //     app.auth().signOut().then(function () {
-        //         console.log("SUCCESFULL LOG OUT");
-        //     }).catch(function (error) {
-        //         console.log(error)
-        //     });
-        // })
-
-        app.auth().signOut().then(function () {
-            // Sign-out successful.
-
-            console.log("SUCCESFULL LOG OUT");
-
-        }).catch(function (error) {
-            // An error happened.
-            console.log(error);
-        });
+        app.database().ref(`mobileUsers/Regular User/${user.uid}`).off();
+       
+        deleteThis.remove().then(() => {
+            app.auth().signOut().then(() => {
+                console.log("SUCCESFULL LOG OUT");
+            }).catch(function (error) {
+                console.log(error)
+            });
+        })
 
     }
     pressedPrediction(place_id, description) {
@@ -798,7 +771,7 @@ export default class RegularUser extends Component {
                 <Text style={{ color: 'white', fontWeight: 'normal', fontSize: 15 }}>
                     You are a {this.state.userType}.
                  </Text>
-                <TouchableOpacity onPress={this.signOutUser}>
+                <TouchableOpacity disabled={this.state.isIncidentReady} onPress={this.signOutUser}>
                     <Text style={{ color: 'white', fontSize: 30 }}>
                         Log Out
                      </Text>
@@ -1118,10 +1091,10 @@ export default class RegularUser extends Component {
                     
                     placeholder="Additional Details"
                     style={styles.detailsInput}
-                    onChangeText={incidentNote => {
-                        this.setState({ incidentNote });
+                    onChangeText={additionalDetails => {
+                        this.setState({ additionalDetails });
                     }}
-                    value={this.state.incidentNote}
+                    value={this.state.additionalDetails}
                     multiline
                       />
                     {locationPredictions}

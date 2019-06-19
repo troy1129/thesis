@@ -29,6 +29,7 @@ export default class Volunteer extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            clearUID:'',
             isModalVisible: false,
             dispatchedVolunteer: false,
             isAccepted: false,
@@ -85,14 +86,13 @@ export default class Volunteer extends Component {
 
     logOut = () => {
         var user = app.auth().currentUser;
+        this.setState({clearUID:user.uid});
         var deleteThis = fire2.database().ref(`mobileUsers/Volunteer/${user.uid}`)
         
-        this.user2 = app.database().ref(`users/${user.uid}/`);
-        this.volunteerListen = app.database().ref(`mobileUsers/Volunteer/${user.uid}`);
+        app.database().ref(`users/${user.uid}/`).off();
+        app.database().ref(`mobileUsers/Volunteer/${user.uid}`).off();
+        
      
-        this.user2.off();
-        this.volunteerListen.off();
-
         deleteThis.remove().then(() => {
             app.auth().signOut().then(() => {
                 console.log("SUCCESFULL LOG OUT");
@@ -466,8 +466,7 @@ export default class Volunteer extends Component {
                             this.getRouteDirection(destinationPlaceId, incidentLocation);
                         }
                         else {
-                            this.userIncidentId = app.database().ref(`incidents/${incidentID}`);
-                            this.userIncidentId.off();
+                            console.log("system is FLAWED")
                         }
                     })
                 }
@@ -551,6 +550,8 @@ export default class Volunteer extends Component {
     componentWillUnmount() {
         this._isMounted = false;
         Geolocation.clearWatch(this.watchId);
+        app.database().ref(`users/${this.state.clearUID}/`).off();
+        app.database().ref(`mobileUsers/Volunteer/${this.state.clearUID}`).off();
     }
 
     setIncidentID = () => {
@@ -674,7 +675,7 @@ export default class Volunteer extends Component {
                 <Text style={{ color: 'white', fontWeight: 'normal', fontSize: 15 }}>
                     You are a {this.state.userType}.
                  </Text>
-                <TouchableOpacity /*disabled={this.state.isIncidentReady}*/ onPress={this.logOut}>
+                <TouchableOpacity disabled={this.state.isIncidentReady} onPress={this.logOut}>
                     <Text style={{ color: 'white', fontSize: 30 }}>
                         Log Out
                      </Text>

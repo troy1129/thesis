@@ -49,7 +49,8 @@ export default class Responder extends Component {
         this.getImage = this.getImage.bind(this)
 
         this.state = {
-            isFeedback:false,
+            clearUID:'',
+            didSettle:false,
             isArrived:false,
             isShown:false,
             isModalVisible: false,
@@ -79,7 +80,7 @@ export default class Responder extends Component {
             lastName: "",
             user: null,
             profilePhoto:'',
-            unresponded: true,
+            unresponded: false,
             originalVolunteerName:'',
             isResponding: false,
             isSettled: false,
@@ -129,6 +130,7 @@ export default class Responder extends Component {
 
     addToMobileUsers = () => {
         let user = app.auth().currentUser;
+        this.setState({clearUID:user.uid});
         var addThis = app.database().ref(`mobileUsers/Responder/${user.uid}`)
         addThis.update({
             incidentID:"",
@@ -140,11 +142,8 @@ export default class Responder extends Component {
         var user = app.auth().currentUser;
         var deleteThis = fire2.database().ref(`mobileUsers/Responder/${user.uid}`)
         
-        this.user2 = app.database().ref(`users/${user.uid}/`);
-        this.responderListen = app.database().ref(`mobileUsers/Responder/${user.uid}`);
-     
-        this.user2.off();
-        this.responderListen.off();
+        app.database().ref(`users/${this.state.clearUID}/`).off();
+        app.database().ref(`mobileUsers/Responder/${this.state.clearUID}`).off();
 
         deleteThis.remove().then(() => {
             app.auth().signOut().then(() => {
@@ -222,7 +221,7 @@ export default class Responder extends Component {
         app.auth().onAuthStateChanged(user => {
             if (user) {
                 this.setState({ user, userId: user.uid });
-                var userId = this.state.userId
+                var userId = this.state.userId;
                 this.getUserInfo();
                 this.incidentListener(userId);
             }
@@ -264,6 +263,7 @@ export default class Responder extends Component {
             responderResponding: this.state.userId,
             image_uri:this.state.image_uri,
             timeReceived: date,
+            unresponded: false,
         });
 
         app.database().ref(`mobileUsers/Responder/${userId}`).update({
@@ -287,20 +287,6 @@ export default class Responder extends Component {
         });
     }
 
-    clearStates = () => {
-        this.setState({
-            isSettled: false,
-            dispatchedResponder: false,
-            isIncidentReady: false,
-            originalResponder: false,
-            isRequestingResponders: false,
-            requestResponders: false,
-            incidentId: "",
-            isAccepted: false,
-           pinUpdate:false
-        })
-    }
-
     clearSettled = () => {
 
         let incidentID = this.state.incidentId;
@@ -311,9 +297,12 @@ export default class Responder extends Component {
         responderListen.update({
             incidentID: '',
             isAccepted: false,
-        }).then(
-            this._toggleModal2()
-        )
+        }).then(()=>{
+            if(didSettle){
+                this._toggleModal2()
+            }
+        })
+
     }
 
     // clearSettledAdditional = () => {
@@ -356,18 +345,14 @@ export default class Responder extends Component {
             requestResponders: false,
             incidentId: "",
             isAccepted: false,
-            pinUpdate:false
+            pinUpdate:false,
+            didSettle:true,
         })
-        var responderListen = app.database().ref(`mobileUsers/Responder/${userId}`)
-        responderListen.update({
-            incidentID: '',
-            isAccepted: false,
-        })
-
+        
         app.database().ref(`incidents/${incidentID}`).update({
             isSettled: true,
             isShown: true,
-        });
+        })
     }
 
 
@@ -497,7 +482,6 @@ export default class Responder extends Component {
         var that = this;
         var incidentDetails = '';
 
-
         this.responderListen.on('value', (snapshot) => {
 
             userId = this.state.userId;
@@ -601,8 +585,7 @@ export default class Responder extends Component {
                         Alert.alert(
                             "INCIDENT HAS BEEN SETTLED",
                             `Incident Type: ${incidentType}
-                                                 Incident Location: ${incidentLocation}
-                                                                         `
+                                                 Incident Location: ${incidentLocation}                                 `
                             ,
                             [
                                 { text: "Ok", onPress: () => { that.clearSettled()} },
@@ -645,8 +628,7 @@ export default class Responder extends Component {
                     //     );
                     // }
                     else {
-                        this.userIncidentId = app.database().ref(`incidents/${incidentID}`);
-                        this.userIncidentId.off();
+                        console.log("system is FLAWED")
                     }
                 })
             }
@@ -810,6 +792,9 @@ export default class Responder extends Component {
     componentWillUnmount() {
         this._isMounted = false;
         Geolocation.clearWatch(this.watchId);
+
+        app.database().ref(`users/${this.state.clearUID}/`).off();
+        app.database().ref(`mobileUsers/Responder/${this.state.clearUID}`).off();
     }
 
   
@@ -828,7 +813,7 @@ export default class Responder extends Component {
             reporterName: fullName,
             incidentType: this.state.incidentType,
             incidentLocation: this.state.incidentLocation,
-            unresponded: true,
+            unresponded: false,
             isResponding: false,
             markerLat:this.state.markerLat,
             markerLng:this.state.markerLng,
@@ -858,7 +843,7 @@ export default class Responder extends Component {
         this.setState({
             incidentType: '',
             incidentLocation: '',
-            unresponded: null,
+            unresponded: false,
             originalVolunteerName:'',
             isResponding: null,
             isSettled: null,
@@ -944,7 +929,7 @@ export default class Responder extends Component {
         this.setState({ isModalVisible: !this.state.isModalVisible });
     }
     _toggleModal2 = () => {
-        this.setState({ isFeedbackVisible: !this.state.isFeedbackVisible,isSettled:false });
+        this.setState({ isFeedbackVisible: !this.state.isFeedbackVisible, isSettled:false, didSettle:false});
     }
 
     _openDrawer = () => {
@@ -1059,7 +1044,7 @@ export default class Responder extends Component {
                     You are a {this.state.userType}.
                  </Text>
 
-                 <TouchableOpacity /*disabled={this.state.isIncidentReady}*/ onPress={this.routeToDetails}>
+                 <TouchableOpacity disabled={this.state.isIncidentReady} onPress={this.routeToDetails}>
                     <Text style={{ color: 'white', fontSize: 30 }}>
                         Change Details
                      </Text>

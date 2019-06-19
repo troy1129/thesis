@@ -169,6 +169,7 @@ export default class RegularUser extends Component {
                 this.setState({ user, userId: user.uid });
                 us = user.uid;
                 this.getUserInfo();
+                this.incidentState(this.state.userId);
             }
         });
     }
@@ -206,9 +207,7 @@ export default class RegularUser extends Component {
     componentDidMount() {
 
         this.authListener();
-
-      this.addToMobileUsers()
-
+        this.addToMobileUsers();
 
         Geolocation.getCurrentPosition(
             position => {
@@ -625,6 +624,7 @@ export default class RegularUser extends Component {
             destinationPlaceId: this.state.destinationPlaceId,
             isRequestingResponders: false,
             isRequestingVolunteers: false,
+            originalVolunteerName:this.state.originalVolunteerName,
             requestResponders:'',
             requestVolunteers:'',
 
@@ -699,25 +699,27 @@ export default class RegularUser extends Component {
         // userId:''
         // });
 
-        // var user = app.auth().currentUser;
-        // var deleteThis = fire2.database().ref(`mobileUsers/Regular User/${user.uid}`)
-        // deleteThis.remove().then(() => {
-        //     app.auth().signOut().then(function () {
-        //         console.log("SUCCESFULL LOG OUT");
-        //     }).catch(function (error) {
-        //         console.log(error)
-        //     });
-        // })
+        var user = app.auth().currentUser;
+        app.database().ref(`mobileUsers/Regular User/${user.uid}`).off();
+        app.database().ref(`mobileUsers/Regular User/${userId}`);
+        var deleteThis = fire2.database().ref(`mobileUsers/Regular User/${user.uid}`)
+        deleteThis.remove().then(() => {
+            app.auth().signOut().then(function () {
+                console.log("SUCCESFULL LOG OUT");
+            }).catch(function (error) {
+                console.log(error)
+            });
+        })
 
-        app.auth().signOut().then(function () {
-            // Sign-out successful.
+        // app.auth().signOut().then(function () {
+        //     // Sign-out successful.
 
-            console.log("SUCCESFULL LOG OUT");
+        //     console.log("SUCCESFULL LOG OUT");
 
-        }).catch(function (error) {
-            // An error happened.
-            console.log(error);
-        });
+        // }).catch(function (error) {
+        //     // An error happened.
+        //     console.log(error);
+        // });
 
     }
     pressedPrediction(place_id, description) {

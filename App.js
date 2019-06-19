@@ -53,11 +53,8 @@ export default class App extends Component {
     this.askUserGPSPermission();
   }
 
-<<<<<<< HEAD
-=======
   
 
->>>>>>> a1b40f10cde77d93e1e24f575dc52a4cf469a4db
   askUserGPSPermission = async () => {
     try {
       const granted = await PermissionsAndroid.request(
@@ -103,25 +100,18 @@ export default class App extends Component {
         this.setState({ user, userId: user.uid });
         this.userDetails();
       } else {
-<<<<<<< HEAD
-        setTimeout(() => Actions.login(), 1500);
-=======
         setTimeout(() => Actions.Login(), 1500);
->>>>>>> a1b40f10cde77d93e1e24f575dc52a4cf469a4db
         this.setState({ user: null, userId: null });
       }
     });
 
   }
-<<<<<<< HEAD
-=======
 
   componentWillUnmount()
   {
     this.authListener()
     console.log('asdf')
   }
->>>>>>> a1b40f10cde77d93e1e24f575dc52a4cf469a4db
   
   signOutUser() {
     app.auth().signOut().then(function () {
@@ -225,11 +215,7 @@ export default class App extends Component {
         <Router>
           <Stack key="root" hideNavBar={true}>
             <Scene key="loading" component={LoadingScreen} initial={true} title="Loading" />
-<<<<<<< HEAD
-            <Scene key="login" component={Login} title="Login" />
-=======
             <Scene key="Login" component={Login} title="Login" />
->>>>>>> a1b40f10cde77d93e1e24f575dc52a4cf469a4db
             <Scene key="signup" component={Register} title="Register" />
             <Scene key="RegularUser" component={RegularUser} title="RegularUser" />
             <Scene key="Volunteer" component={Volunteer} title="Volunteer" />

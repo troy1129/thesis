@@ -81,6 +81,7 @@ export default class Responder extends Component {
             profilePhoto:'',
             unresponded: true,
             originalVolunteerName:'',
+            originalResponderName:'',
             isResponding: false,
             isSettled: false,
             modalVisible:null,
@@ -262,6 +263,7 @@ export default class Responder extends Component {
             responderResponding: this.state.userId,
             image_uri:this.state.image_uri,
             timeReceived: date,
+            originalResponderName:this.state.firstName+' '+this.state.lastName
         });
 
         app.database().ref(`mobileUsers/Responder/${userId}`).update({
@@ -516,6 +518,7 @@ export default class Responder extends Component {
                     var incidentType = incidentDetails.incidentType;
                     var incidentLocation = incidentDetails.incidentLocation;
                     var originalVolunteerName=incidentDetails.originalVolunteerName;
+                    var originalResponderName=incidentDetails.originalResponderName;
                     var image_uri = incidentDetails.image_uri;
                     var incidentNote=incidentDetails.incidentNote;
                     var markerLat = incidentDetails.coordinates.lat;
@@ -535,18 +538,18 @@ export default class Responder extends Component {
                                                                          `
                             ,
                             [
-                                { text: "Respond", onPress: () => { that.changeIncidentState(incidentType, incidentLocation, incidentID, destinationPlaceId, userId, image_uri,markerLat,markerLng,incidentNote,originalVolunteerName) } },
+                                { text: "Respond", onPress: () => { that.changeIncidentState(incidentType, incidentLocation, incidentID, destinationPlaceId, userId, image_uri,markerLat,markerLng,incidentNote,originalVolunteerName,originalResponderName) } },
                             ],
                             { cancelable: false }
                         );
-                        that.setState({ originalResponder: true, isIncidentReady: true, incidentType, incidentLocation, destinationPlaceId, userId, incidentId: incidentID, image_uri,markerLat,markerLng,incidentNote,originalVolunteerName });
+                        that.setState({ originalResponder: true, isIncidentReady: true, incidentType, incidentLocation, destinationPlaceId, userId, incidentId: incidentID, image_uri,markerLat,markerLng,incidentNote,originalVolunteerName,originalResponderName });
                     }
                     //SAME RESPONDER SENT REPORT, ORIGINAL RESPONDER
                     else if (incidentID !== "" && responderResponding === userId && isSettled === false) {
                         console.log("ARGUMENT 2");
                         console.log("same responder");
 
-                        that.setState({ originalResponder: true, isIncidentReady: true, incidentType, incidentLocation, destinationPlaceId, userId, incidentId: incidentID, isSettled: false, image_uri ,markerLat,markerLng,incidentNote,originalVolunteerName});
+                        that.setState({ originalResponder: true, isIncidentReady: true, incidentType, incidentLocation, destinationPlaceId, userId, incidentId: incidentID, isSettled: false, image_uri ,markerLat,markerLng,incidentNote,originalVolunteerName,originalResponderName});
                         that.getRouteDirection(destinationPlaceId, incidentLocation);
                       
                     }
@@ -729,6 +732,8 @@ export default class Responder extends Component {
             feedbackTimeSettled:time,
             incidentType:this.state.incidentType,
             incidentOriginalVolunteer: this.state.originalVolunteerName,
+            incidentOriginalResponder:this.state.originalResponderName,
+            
         });
 
         app.database().ref(`incidents/${this.state.incidentId}/incidentLocation`).once('value').then(snap=>{
@@ -846,6 +851,7 @@ export default class Responder extends Component {
             timeReceived: date,
             timeResponderResponded: '',
             responderResponding: this.state.userId,
+            originalResponderName:this.state.firstName+' '+this.state.lastName,
             volunteerResponding: '',
             coordinates: {
                 lat: coordLat,

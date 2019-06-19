@@ -618,6 +618,8 @@ export default class RegularUser extends Component {
             timeResponded: '',
             image_uri: this.state.image_uri,
             responderResponding: '',
+            originalResponderName:'',
+            originalVolunteerName:'',
             volunteerResponding: '',
             coordinates: {
                 lat: coordLat,

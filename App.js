@@ -134,29 +134,29 @@ export default class App extends Component {
       console.log("user values", userValue);
       this.setState({ userType: userValue.user_type, isVerified: userValue.isVerified });
       this.setState({ userAccount: userValue });
-      // if (fire2.auth().currentUser.emailVerified===false)
-      // {
-      //   alert(JSON.stringify(fire2.auth().currentUser.emailVerified))
-      //   this.setState({ user: null, userId: null, userAccount: null, isVerified: false, userType: false });
-      //   console.log("user not verified");
-      //   Alert.alert(
-      //     "Email Address is not Verified",
-      //     `Check Email Address for Verification Email`
-      //     ,
-      //     [
-      //       { text: "Ok", onPress: () => { this.signOutUser() } },
-      //     ],
-      //     { cancelable: false }
-      //   );
+      if (fire2.auth().currentUser.emailVerified===false)
+      {
+        alert(JSON.stringify(fire2.auth().currentUser.emailVerified))
+        this.setState({ user: null, userId: null, userAccount: null, isVerified: false, userType: false });
+        console.log("user not verified");
+        Alert.alert(
+          "Email Address is not Verified",
+          `Check Email Address for Verification Email`
+          ,
+          [
+            { text: "Ok", onPress: () => { this.signOutUser() } },
+          ],
+          { cancelable: false }
+        );
 
-      // }
-      // else if (fire2.auth().currentUser.emailVerified===true && this.state.isVerified===false)
-      // {
-      //     fire2.database().ref('unverifiedMobileUsers/' + this.state.userId).update({
-      //       user_type: this.state.userType,
-      //   })
+      }
+      else if (fire2.auth().currentUser.emailVerified===true && this.state.isVerified===false)
+      {
+          fire2.database().ref('unverifiedMobileUsers/' + this.state.userId).update({
+            user_type: this.state.userType,
+        })
         
-      // }
+      }
       if (this.state.isVerified === true) {
         this.rerouteUserAccess();
       } 

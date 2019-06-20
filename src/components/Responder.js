@@ -263,6 +263,7 @@ export default class Responder extends Component {
             unrespondedResponder: false,
             responderResponding: this.state.userId,
             image_uri:this.state.image_uri,
+            originalVolunteerName:this.state.originalVolunteerName,
             timeReceived: date,
             unresponded: false,
         });
@@ -294,12 +295,16 @@ export default class Responder extends Component {
         let userId = this.state.userId;
         console.log("is settled?", incidentID, userId);
 
+        app.database().ref(`incidents/${incidentID}`).update({
+            isShown: true
+        });
+        
         var responderListen = app.database().ref(`mobileUsers/Responder/${userId}`)
         responderListen.update({
             incidentID: '',
             isAccepted: false,
         }).then(()=>{
-            if(didSettle){
+            if(this.state.didSettle){
                 this._toggleModal2()
             }
         })
@@ -351,8 +356,7 @@ export default class Responder extends Component {
         });
         
         app.database().ref(`incidents/${incidentID}`).update({
-            isSettled: true,
-            isShown: true,
+            isSettled: true
         });
     }
 
@@ -559,7 +563,7 @@ export default class Responder extends Component {
                     //RESPONDER WHO SENT REPORT SETTLES REPORT
                     else if (incidentID !== "" && responderResponding === userId && isSettled === true) {
                         console.log("ARGUMENT 6");
-                        that.setState({ isSettled: true, isIncidentReady: false, incidentType, incidentLocation, destinationPlaceId, incidentId: incidentID, userId,markerLat:null,markerLng:null});
+                        that.setState({ isIncidentReady: false, incidentType, incidentLocation, destinationPlaceId, incidentId: incidentID, userId,markerLat:null,markerLng:null});
                         Alert.alert(
                             "INCIDENT HAS BEEN SETTLED43",
                             `Incident Type: ${incidentType}
@@ -585,7 +589,7 @@ export default class Responder extends Component {
                         console.log("ARGUMENT 6");
                         that.setState({ isSettled: true, isIncidentReady: false, incidentType, incidentLocation, destinationPlaceId, incidentId: incidentID, userId, markerLat:null,markerLng:null});
                         Alert.alert(
-                            "INCIDENT HAS BEEN SETTLED",
+                            "INCIDENT HAS BEEN SETTLED ADDITIONAL",
                             `Incident Type: ${incidentType}
                                                  Incident Location: ${incidentLocation}
                                                                          `
@@ -708,7 +712,7 @@ export default class Responder extends Component {
 
     sendIncidentFeedback = () => {
         var time = Date(Date.now());
-
+        this.setState({isSettled:false})
         app.database().ref(`/Archives/${this.state.incidentId}`).update({
             feedbackByResponder:this.state.firstName+' '+this.state.lastName,
             feedbackLocation: this.state.incidentFeedbackLocation,
@@ -824,6 +828,7 @@ export default class Responder extends Component {
             unresponded: false,
             isResponding: false,
             markerLat:this.state.markerLat,
+            isShown:false,
             markerLng:this.state.markerLng,
             isSettled: false,
             incidentNote:this.state.incidentNote,
@@ -896,6 +901,7 @@ export default class Responder extends Component {
     setIncidentID = () => {
         app.database().ref(`mobileUsers/Responder/${this.state.userId}`).update({
             incidentID: this.state.incidentUserKey,
+            isAccepted:true,
         });
 
     }

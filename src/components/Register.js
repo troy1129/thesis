@@ -180,7 +180,7 @@ class Register extends Component {
         const auth = fire2.auth();
         const promise = auth.createUserWithEmailAndPassword(email.trim(), password.trim());
         promise.then(user => {
-            //this.doSendEmailVerification()
+            this.doSendEmailVerification()
             let points=this.computePoints()
             Alert.alert(JSON.stringify(`Account ${values.email} has been created`))
             Keyboard.dismiss();

@@ -44,7 +44,7 @@ export default class RegularUser extends Component {
             hasVolunteerAlerted: false,
             userKey: "",
             userType: '',
-            incidentType: "",
+            incidentType: "Vehicular Accident",
             incidentLocation: "",
             firstName: "",
             lastName: "",
@@ -464,7 +464,7 @@ export default class RegularUser extends Component {
                     }
                     console.log("volunteer responding", volunteerRespondingID);
                     // that.setState({ volunteerRespondingID });
-                    that.volunteerCoordinates(volunteerRespondingID);
+                    that.volunteerCoordinates(volunteerRespondingID); // turn this off
                 } else {
                     console.log("volunteer responding", volunteerRespondingID);
                     that.setState({ volunteerRespondingID });
@@ -593,7 +593,7 @@ export default class RegularUser extends Component {
 
     submitIncidentHandler = () => {
         var date = Date(Date.now());
-        var fullName = this.state.firstName+''+this.state.lastName;
+        var fullName = this.state.firstName+' '+this.state.lastName;
         date1 = date.toString();
         this.setState({pinFinal:true,isModalVisible: !this.state.isModalVisible,
         })
@@ -607,6 +607,7 @@ export default class RegularUser extends Component {
             incidentNote:this.state.incidentNote,
             unresponded: true,
             isResponding: false,
+            isShown: false,
             isSettled: false,
             markerLat:this.state.markerLat,
             markerLng:this.state.markerLng,
@@ -624,7 +625,7 @@ export default class RegularUser extends Component {
             destinationPlaceId: this.state.destinationPlaceId,
             isRequestingResponders: false,
             isRequestingVolunteers: false,
-            originalVolunteerName:this.state.originalVolunteerName,
+            originalVolunteerName:'',
             requestResponders:'',
             requestVolunteers:'',
 

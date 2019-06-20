@@ -23,6 +23,7 @@
     "react-native-button": "^2.3.0",
     "react-native-circle-drawer": "^1.0.0",
     "react-native-fetch-blob": "^0.10.8",
+    "react-native-firebase": "~5.5.2",
     "react-native-geolocation-service": "^2.0.0",
     "react-native-image-picker": "^0.28.1",
     "react-native-image-view": "^2.1.4",

@@ -172,10 +172,6 @@ class Register extends Component {
         return points;
     }
 
-   
-    
-
-
     createUserAccount(
         values
     ) {

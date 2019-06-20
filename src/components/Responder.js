@@ -944,9 +944,6 @@ export default class Responder extends Component {
         this.refs.DRAWER.open();
     }
 
-
-   
-
     renderContent = () => {
         const { isImageViewVisible } = this.state;
         const images = [

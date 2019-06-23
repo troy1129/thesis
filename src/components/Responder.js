@@ -73,7 +73,7 @@ export default class Responder extends Component {
             markerLng:null,
             image_uri:'',
             isImageViewVisible: false,
-            incidentType: "",
+            incidentType: "Vehicular Accident",
             incidentLocation: "",
             firstName: "",
             lastName: "",
@@ -265,9 +265,8 @@ export default class Responder extends Component {
             image_uri:this.state.image_uri,
             responderRespondingReceived: date,
         }).then(
-            setTimeout(
                 app.database().ref(`incidents/${incidentID}`).update({
-                isRespondingResponderShown:true,},5000))
+                isRespondingResponderShown:true,})
             
          );
 
@@ -295,9 +294,9 @@ export default class Responder extends Component {
             responderRespondingArrived: date,
             isArrivedResponder:true,
         }).then(
-            setTimeout(
+            
                 app.database().ref(`incidents/${incidentID}`).update({
-                isArrivedResponderShown:true,},5000))
+                isArrivedResponderShown:true,})
          );
     }
 
@@ -320,9 +319,13 @@ export default class Responder extends Component {
         let incidentID = this.state.incidentId;
         let userId = this.state.userId;
         console.log("is settled?", incidentID, userId);
+        this.setState({isIncidentReady:false})
         app.database().ref(`users/${userId}`).update({
             incidentId:'',
             isAccepted:false,
+        })
+        app.database().ref(`incidents/${incidentID}`).update({
+           isShown:true
         })
         var responderListen = app.database().ref(`mobileUsers/Responder/${userId}`)
         responderListen.update({
@@ -376,7 +379,8 @@ export default class Responder extends Component {
             requestResponders: false,
             incidentId: "",
             isAccepted: false,
-            pinUpdate:false
+            pinUpdate:false,
+            
         })
         var responderListen = app.database().ref(`mobileUsers/Responder/${userId}`)
         responderListen.update({
@@ -389,7 +393,9 @@ export default class Responder extends Component {
             timeSettled: date,
             unresponded:false,
             isResponding:false
-        });
+        }).then(
+        this.setState({didSettle:true})
+            );
      
     }
 
@@ -600,7 +606,7 @@ export default class Responder extends Component {
                     //RESPONDER WHO SENT REPORT SETTLES REPORT
                     else if (incidentID !== "" && responderResponding === userId && isSettled === true) {
                         console.log("ARGUMENT 6");
-                        that.setState({isIncidentReady: false, incidentType, incidentLocation, destinationPlaceId, incidentId: incidentID, userId,markerLat:null,markerLng:null});
+                        that.setState({isIncidentReady: false, incidentType, incidentLocation, destinationPlaceId, incidentId: incidentID, userId,markerLat:null,markerLng:null,didSettle:true});
                         Alert.alert(
                             "INCIDENT HAS BEEN SETTLED43",
                             `Incident Type: ${incidentType}
@@ -864,7 +870,7 @@ export default class Responder extends Component {
  incidentType: this.state.incidentType,
  incidentLocation: this.state.incidentLocation,
  incidentNote:this.state.incidentNote,
- timeReceived: date1,
+ timeReceived: date,
  image_uri: this.state.image_uri,
  isResponding: true,
  markerLat:this.state.markerLat,
@@ -873,7 +879,7 @@ export default class Responder extends Component {
  reporterName: fullName,
  responderResponding: '',
  volunteerResponding: '',
- originalResponderName: '',
+ originalResponderName: fullName,
  originalVolunteerName:'',
  coordinates: {
  lat: coordLat,

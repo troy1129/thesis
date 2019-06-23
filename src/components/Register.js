@@ -575,15 +575,23 @@ class Register extends Component {
 
                     
                         <RadioGroup radioButtons={this.state.data} onPress={this.userType} />
-                        <TouchableOpacity style={styles.button}
-                            disabled={(!this.state.medicalProfession)||(!isValid)}
-                            onPress={handleSubmit}>
-
-                            <Text style={styles.buttonText}>
-                                Register
-                    </Text>
-
-                        </TouchableOpacity>
+                        {this.state.user_type === "Volunteer" ? (
+                            <TouchableOpacity style={styles.button}
+                                disabled={(!this.state.medicalProfession)||(!isValid)}
+                                onPress={handleSubmit}>
+                                <Text style={styles.buttonText}>
+                                    Register for Volunteers
+                                </Text>
+                            </TouchableOpacity> ):(
+                            <TouchableOpacity style={styles.button}
+                                disabled={(!isValid)}
+                                onPress={handleSubmit}>
+                                <Text style={styles.buttonText}>
+                                    Register for Non Volunteers
+                                </Text>
+                            </TouchableOpacity>
+                            )}
+                        
                         <TouchableOpacity style={styles.button}
                             onPress={this.checkState}>
 

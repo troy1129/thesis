@@ -261,14 +261,18 @@ export default class Responder extends Component {
 
         app.database().ref(`incidents/${incidentID}`).update({
             isResponding:true,
-            isRespondingResponder: true,
-            isRespondingResponderShown:true,
+            isRespondingResponder:true,
             unrespondedResponder: false,
             responderResponding: this.state.userId,
             originalResponderName: this.state.firstName + ' ' + this.state.lastName,
             image_uri:this.state.image_uri,
             responderRespondingReceived: date,
-        });
+        }).then(
+            setTimeout(
+                app.database().ref(`incidents/${incidentID}`).update({
+                isRespondingResponderShown:true,},5000))
+            
+         );
 
         app.database().ref(`mobileUsers/Responder/${userId}`).update({
             isAccepted: true,
@@ -292,8 +296,12 @@ export default class Responder extends Component {
         console.log("incidentID on arrived Location", incidentID);
         app.database().ref(`incidents/${incidentID}`).update({
             responderRespondingArrived: date,
-            isArrivedResponderShown:true,
-        });
+            isArrivedResponder:true,
+        }).then(
+            setTimeout(
+                app.database().ref(`incidents/${incidentID}`).update({
+                isArrivedResponderShown:true,},5000))
+         );
     }
 
     clearSettled = () => {
@@ -316,7 +324,7 @@ export default class Responder extends Component {
             isAccepted: false,
         }).then(()=>{
             if(this.state.didSettle){
-                this._toggleModal2()
+                this._toggleModal2
             }
         })
 
@@ -329,7 +337,7 @@ export default class Responder extends Component {
         console.log("is settled?", incidentID, userId);
 
         this.setState({
-            isSettled: false,
+            isSettled: true,
             dispatchedResponder: false,
             isIncidentReady: false,
             originalResponder: false,
@@ -346,7 +354,9 @@ export default class Responder extends Component {
 
         app.database().ref(`incidents/${incidentID}`).update({
             isSettled: true,
-            timeSettled: date
+            timeSettled: date,
+            unresponded:false,
+            isResponding:false
         });
      
     }
@@ -395,12 +405,8 @@ export default class Responder extends Component {
             isIncidentReady: true,
             requestResponders: true,
         })
-        
-        app.database().ref(`incidents/${incidentID}`).update({
-            isRespondingAddResponderShown: true,
-        })
 
-        app.database().ref(`incidents/${incidentID}/requestedResponders/${userId}`).update({
+        app.database().ref(`incidents/${incidentId}/requestedResponders/${userId}`).update({
             name:this.state.firstName+ ' ' +this.state.lastName,
             timeArrived: ' ',
             timeReceived: date,
@@ -834,60 +840,45 @@ export default class Responder extends Component {
         var coordLng = coords2.longitude;
         app.database().ref("/incidents").push({
             destinationPlaceId: this.state.destinationPlaceId,
-            incidentType: this.state.incidentType,
-            incidentLocation: this.state.incidentLocation,
-            incidentNote:this.state.incidentNote,
-           
-            isResponding: true,
-           
-            isShown: false,
-            isSettled: false,
-           
-            isRequestingResponders: false,
-            isRequestingVolunteers: false,
+ incidentType: this.state.incidentType,
+ incidentLocation: this.state.incidentLocation,
+ incidentNote:this.state.incidentNote,
+ timeReceived: date1,
+ image_uri: this.state.image_uri,
+ isResponding: true,
+ markerLat:this.state.markerLat,
+ markerLng:this.state.markerLng,
+ reporterUID: this.state.userId,
+ reporterName: fullName,
+ responderResponding: '',
+ volunteerResponding: '',
+ originalResponderName: '',
+ originalVolunteerName:'',
+ coordinates: {
+ lat: coordLat,
+ lng: coordLng
+ },
 
-            isRespondingResponder:true,
-            isRespondingVolunteer: false,
-           
-            isRespondingResponderShown:true,
-            isRespondingVolunteerShown:false,
+ unresponded: false,
 
-            isRespondingAddResponderShown: false,
-            isRespondingAddVolunteerShown: false,
-           
-            isArrivedResponderShown:false,
-            isArrivedVolunteerShown:false,
+ isShown: false,
+ isSettled: false,
+ isRedundantReport:false,
 
-            isArrivedAddResponderShown:false,
-            isArrivedAddVolunteerShown:false,
-           
-            markerLat:this.state.markerLat,
-            markerLng:this.state.markerLng,
-           
-            reporterUID: this.state.userId,
-            reporterName: fullName,
-           
-            timeReceived: date1,
-            image_uri: this.state.image_uri,
-           
-            responderResponding: this.state.userId,
-            volunteerResponding: '',
+ isRequestingResponders: false,
+ isRequestingVolunteers: false,
 
-            responderRespondingReceived: date,
-            responderRespondingArrived: '',
+ isRespondingResponderShown:false,
+ isRespondingVolunteerShown:false,
 
-            volunteerRespondingReceived:'',
-            volunteerRespondingArrived:'',
-           
-            originalResponderName: fullName,
-            originalVolunteerName:'',
-           
-            coordinates: {
-            lat: coordLat,
-            lng: coordLng
-            },
-           
-            unresponded: true,
+ isRespondingResponder:true,
+ isRespondingVolunteer: false,
+
+ isArrivedResponder: false,
+    isArrivedResponderShown: false,
+    isArrivedVolunteer: false,
+    isArrivedVolunteerShown: false,
+
         }).then((snap) => {
             const incidentUserKey = snap.key
             this.setState({ incidentUserKey })
@@ -986,7 +977,7 @@ export default class Responder extends Component {
         this.setState({ isModalVisible: !this.state.isModalVisible });
     }
     _toggleModal2 = () => {
-        this.setState({ isFeedbackVisible: !this.state.isFeedbackVisible });
+        this.setState({ isFeedbackVisible: !this.state.isFeedbackVisible, didSettle:false });
     }
 
     _openDrawer = () => {

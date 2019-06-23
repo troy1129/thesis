@@ -39,7 +39,7 @@ class Login extends Component {
       .catch(e => {
         var err = e.message;
         console.log(err);
-        this.setState({ err: 'Username or Password is Incorrect' });
+        this.setState({ err: err });
       });
     console.log("Login");
     Keyboard.dismiss();

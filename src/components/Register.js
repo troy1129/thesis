@@ -4,10 +4,12 @@ import Modal from 'react-native-modal';
 import React, { Component } from 'react';
 import {
     StyleSheet, Text, View, TextInput,ScrollView,
-    TouchableOpacity, Button, Alert, Keyboard,Dimensions,Image
+    TouchableOpacity, Button, Alert, Keyboard,Dimensions,Image,Platform
 } from 'react-native';
 import RadioGroup from "react-native-radio-buttons-group";
 import { fire2 } from '../config/fire';
+import app from '../config/fire';
+
 import { Formik } from 'formik'
 import * as yup from 'yup'
 import RNPickerSelect from 'react-native-picker-select';
@@ -21,7 +23,12 @@ const activeVolunteerOptions = [
     { label: 'Yes', value: 'Yes'},
     { label: 'No', value: 'No'},
 ]
-
+// var options = {
+// };
+// const Blob = RNFetchBlob.polyfill.Blob
+// const fs = RNFetchBlob.fs
+// window.XMLHttpRequest = RNFetchBlob.polyfill.XMLHttpRequest
+// window.Blob = Blob
 const surgeon_medicalDegreeOptions = [
     { label: 'Bachelor of Medicine and Bachelor of Surgery (MBBS)', value: 'Bachelor of Medicine and Bachelor of Surgery'},
     { label: 'Master of Medicine (MM, MMed)', value: 'Master of Medicine'},
@@ -80,6 +87,8 @@ const durationServiceOptions = [
 class Register extends Component {
     constructor(props) {
         super(props);
+        // this.getImage = this.getImage.bind(this)
+
         this.state = {
             email: '',
             password: '',
@@ -92,6 +101,7 @@ class Register extends Component {
             medicalProfession:'',
             lastName: '',
             contactNumber: '',
+            finalPhoto:'',
             isModalVisible:false,
             isMobile: true,
             user_type: 'Responder',
@@ -172,7 +182,60 @@ class Register extends Component {
         return points;
     }
 
-   
+    // imageBlob(uri, mime = 'application/octet-stream') {
+    //     return new Promise((resolve, reject) => {
+    //         const uploadUri = Platform.OS === 'ios' ? uri.replace('file://', '') : uri
+    //         let uploadBlob = null
+    //         const imageRef = app.storage().ref('images').child(`${this.state.user_type}/ProfilePhotos/${fire2.auth().currentUser.uid}`)
+
+    //         fs.readFile(uploadUri, 'base64')
+    //             .then((data) => {
+    //                 return Blob.build(data, { type: `${mime};BASE64` })
+    //             })
+    //             .then((blob) => {
+    //                 uploadBlob = blob
+    //                 return imageRef.put(blob, { contentType: mime })
+    //             })
+    //             .then(() => {
+    //                 uploadBlob.close()
+    //                 return imageRef.getDownloadURL()
+    //             })
+    //             .then((url) => {
+    //                 resolve(url)
+    //                 console.log(url)
+    //             })
+    //             .catch((error) => {
+    //                 reject(error)
+    //             })
+    //     })
+    // }
+
+    
+    // getImage(){
+    
+    //     ImagePicker.launchCamera(options, (response) => {
+    //         if (response.didCancel) {
+    //             Alert.alert('User Cancelled Taking Photo')
+    //           } 
+    //           else{
+    //     //   this.imageBlob(response.uri)
+    //     //     .then(alert('Uploading Please Wait!'), this.setState({uploading:true}), console.log(this.state.uploading))
+    //     //     .then(url => { alert('Photo has been Uploaded'); this.setState({image_uri: url, uploading:false}); console.log(this.state.uploading) })
+    //     //     .catch(error => console.log(error))
+    //      this.setState({profilePhoto:response.uri})
+    //      alert(JSON.stringify(response.uri))
+    //           }
+    //       }
+    //     )};
+    
+    // uploadImage = () =>
+    // {
+    //     alert(JSON.stringify(this.state.userId))
+    //        this.imageBlob(this.state.profilePhoto)
+    //         .then(alert('Uploading Please Wait!'), this.setState({uploading:true}), console.log(this.state.uploading))
+    //         .then(url => { alert('Photo has been Uploaded'); this.setState({finalPhoto:url, uploading:false}); console.log(this.state.uploading) })
+    //         .catch(error => console.log(error))
+    // }
     
 
 
@@ -211,6 +274,7 @@ class Register extends Component {
                     },
                     incidentID: "",
                     isAccepted: false,
+
                 })
 
             } else {
@@ -232,13 +296,6 @@ class Register extends Component {
                     points:points
                 })
             }
-            if(fire2.auth().currentUser.emailVerified===true)
-            {
-            unverified.update({
-                user_type: this.state.user_type,
-            })
-            }
-
             app.update({
                 email: values.email,
                 password: values.password,
@@ -256,6 +313,7 @@ class Register extends Component {
             var err = e.message;
             Alert.alert(JSON.stringify(`${err}`))
         })
+        
 
     };
 
@@ -579,6 +637,29 @@ class Register extends Component {
 
                     
                         <RadioGroup radioButtons={this.state.data} onPress={this.userType} />
+                        {this.state.user_type==="Volunteer" ? <TouchableOpacity style={styles.button}
+                            disabled={(!this.state.medicalProfession)||(!isValid)}
+                            onPress={handleSubmit}>
+
+                            <Text style={styles.buttonText}>
+                                Register
+                    </Text>
+
+                        </TouchableOpacity> : <TouchableOpacity style={styles.button}
+                            disabled={(!isValid)}
+                            onPress={handleSubmit}>
+
+                            <Text style={styles.buttonText}>
+                                Register for Non Volunteers 
+                    </Text>
+
+    </TouchableOpacity> }
+
+
+
+
+
+{/* 
                         <TouchableOpacity style={styles.button}
                             disabled={(!this.state.medicalProfession)||(!isValid)}
                             onPress={handleSubmit}>
@@ -587,12 +668,12 @@ class Register extends Component {
                                 Register
                     </Text>
 
-                        </TouchableOpacity>
+                        </TouchableOpacity> */}
                         <TouchableOpacity style={styles.button}
-                            onPress={this.checkState}>
+                            onPress={this.getImage}>
 
                             <Text style={styles.buttonText}>
-                                check
+                                Set Profile Picture
                     </Text>
 
                         </TouchableOpacity>

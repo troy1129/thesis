@@ -34,6 +34,8 @@ export default class App extends Component {
     this.state = {
       user: {},
       userId: "",
+      incidentID:"",
+      isAccepted:"",
       isVerified: false,
       userType: [],
       userAccount: {
@@ -51,6 +53,7 @@ export default class App extends Component {
   componentDidMount() {
     this.authListener();
     this.askUserGPSPermission();
+    
   }
 
   
@@ -132,7 +135,7 @@ export default class App extends Component {
       userValue = snapshot.val();
       // console.log("uservalues", userValue);
       console.log("user values", userValue);
-      this.setState({ userType: userValue.user_type, isVerified: userValue.isVerified });
+      this.setState({ userType: userValue.user_type, isVerified: userValue.isVerified, incidentID:userValue.incidentId, isAccepted:userValue.isAccepted });
       this.setState({ userAccount: userValue });
       // if (fire2.auth().currentUser.emailVerified===false)
       // {
@@ -183,19 +186,36 @@ export default class App extends Component {
 
   rerouteUserAccess = () => {
     // console.log("thisss", this.state.userType);
+    app.database().ref(`mobileUsers/${this.state.userType}/${this.state.userId}`).update({
+      coordinates: {
+        lng: "",
+        lat: "",
+    },
+      incidentID:this.state.incidentID,
+      isAccepted:this.state.isAccepted,
+      })
     switch (this.state.userType) {
       case 'Regular User':
         // console.log('Regular User');
         Actions.RegularUser();
+        // app.database().ref(`mobileUsers/RegularUser/${user.uid}`).update({
+        //   incidentID:this.state.incidentID,
+        //   });
         // browserHistory.push('/administrator');
         //this.props.logUser();
         break;
       case 'Responder':
+          Actions.Responder()
+          
+          
         // console.log('Responder');
         // browserHistory.push('/ccpersonnel');
-        Actions.Responder();
         break;
       case 'Volunteer':
+          // app.database().ref(`mobileUsers/Responder/${user.uid}`).update({
+          //   incidentID:"",
+          //   isAccepted:false,
+          //   });
         // console.log('Volunteer');
         Actions.Volunteer();
         // browserHistory.push('/ccpersonnel');

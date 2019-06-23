@@ -234,8 +234,6 @@ signOutUserEmail()
         break;
       case 'Responder':
           Actions.Responder()
-          
-          
         // console.log('Responder');
         // browserHistory.push('/ccpersonnel');
         break;

@@ -619,11 +619,27 @@ export default class RegularUser extends Component {
  incidentType: this.state.incidentType,
  incidentLocation: this.state.incidentLocation,
  incidentNote:this.state.incidentNote,
-
+ timeReceived: date1,
+ image_uri: this.state.image_uri,
  isResponding: false,
+ markerLat:this.state.markerLat,
+ markerLng:this.state.markerLng,
+ reporterUID: this.state.userId,
+ reporterName: fullName,
+ responderResponding: '',
+ volunteerResponding: '',
+ originalResponderName: '',
+ originalVolunteerName:'',
+ coordinates: {
+ lat: coordLat,
+ lng: coordLng
+ },
+
+ unresponded: true,
 
  isShown: false,
  isSettled: false,
+ isRedundantReport:false,
 
  isRequestingResponders: false,
  isRequestingVolunteers: false,
@@ -634,37 +650,10 @@ export default class RegularUser extends Component {
  isRespondingResponder:false,
  isRespondingVolunteer: false,
 
- isRespondingAddResponderShown: false,
- isRespondingAddVolunteerShown: false,
-
- isArrivedResponderShown:false,
- isArrivedVolunteerShown:false,
-
- isArrivedAddResponderShown:false,
- isArrivedAddVolunteerShown:false,
-
- markerLat:this.state.markerLat,
- markerLng:this.state.markerLng,
-
- reporterUID: this.state.userId,
- reporterName: fullName,
-
- timeReceived: date1,
- image_uri: this.state.image_uri,
-
- responderResponding: '',
- volunteerResponding: '',
-
- originalResponderName: '',
- originalVolunteerName:'',
-
- coordinates: {
- lat: coordLat,
- lng: coordLng
- },
-
- unresponded: true,
-
+ isArrivedResponder: false,
+    isArrivedResponderShown: false,
+    isArrivedVolunteer: false,
+    isArrivedVolunteerShown: false,
 
  }).then((snap) => {
  const incidentUserKey = snap.key;

@@ -165,14 +165,18 @@ export default class Volunteer extends Component {
 
         app.database().ref(`incidents/${incidentID}`).update({
             isRespondingVolunteer: true,
-            isRespondingVolunteerShown:true,
             image_uri: this.state.image_uri,
             unrespondedVolunteer: false,
             volunteerResponding: this.state.userId,
             volunteerRespondingReceived: date1,
             originalVolunteerName:this.state.firstName+' '+this.state.lastName
 
-        });
+        }).then(
+            setTimeout(
+                app.database().ref(`incidents/${incidentID}`).update({
+                isRespondingVolunteerShown:true,},5000))
+            
+         );
 
         app.database().ref(`users/${this.state.userId}`).update({
             incidentId: this.state.incidentID,
@@ -195,7 +199,12 @@ export default class Volunteer extends Component {
         app.database().ref(`incidents/${incidentID}`).update({
             volunteerRespondingArrived:date1,
             isArrivedVolunteerShown:true,
-        });
+        }).then(
+            setTimeout(
+                app.database().ref(`incidents/${incidentID}`).update({
+                isRespondingVolunteerShown:true,},5000))
+            
+         );
     }
 
     // additionalDispatchedVolunteer = (incidentID, userId, destinationPlaceId, incidentLocation) => {
@@ -291,9 +300,7 @@ export default class Volunteer extends Component {
             dispatchedResponder: true,
         })
 
-        app.database().ref(`incidents/${incidentID}`).update({
-            isRespondingAddVolunteerShown:true
-        });
+       
 
         app.database().ref(`incidents/${incidentID}/multipleVolunteers/${userId}`).update({
             name:this.state.firstName+' '+this.state.lastName,
@@ -332,9 +339,6 @@ export default class Volunteer extends Component {
             requestVolunteers: true,
         });
 
-        app.database().ref(`incidents/${incidentID}/`).update({
-            isRespondingAddVolunteerShown:true
-        });
 
         app.database().ref(`incidents/${incidentId}/requestedVolunteers/${userId}`).update({
             name:this.state.firstName+' '+this.state.lastName,

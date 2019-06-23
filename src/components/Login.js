@@ -8,7 +8,7 @@ import { Formik } from 'formik'
 import * as yup from 'yup'
 
 import { Actions } from 'react-native-router-flux';
-
+import forgetPassword from './forgetPassword'
 import Logo from './Logo';
 
 
@@ -51,7 +51,10 @@ class Login extends Component {
     Actions.signup()
   }
 
-
+  directForgetPassword()
+  {
+    Actions.forgetPassword()
+  }
 
 
   componentWillMount() {
@@ -146,9 +149,16 @@ class Login extends Component {
               <Text style={styles.signupText}>Don't have an account yet?</Text>
               <TouchableOpacity onPress={this.signUp}><Text style={styles.signupButton}> Signup</Text></TouchableOpacity>
             </View>
+           <View>
+              <Text style={styles.signupText}>Forgot Password?</Text>
+              <TouchableOpacity onPress={this.directForgetPassword}><Text style={styles.signupButton}> Reset Password</Text></TouchableOpacity>
+            </View>
           </View>
+          
         )}
+       
       </Formik>
+      
     );
   }
 }

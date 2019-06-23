@@ -192,20 +192,17 @@ render()
             currentPassword: yup
               .string()
               .strict(true)
-              .matches(/[a-zA-Z0-9]+$/, 'Password contains Special Characte')
-              .trim('Password contains Special Characters')
+              .matches( /^.*(?=.{8,})((?=.*[!@#$%^&*()\-_=+{};:,<.>]){1})(?=.*\d)((?=.*[a-z]){1})((?=.*[A-Z]){1}).*$/, 'Password must be 8 characters long and contain One(1) Lower Case Letter, Upper Case Letter, Number, and Special Character.')              .trim('Password contains Special Characters')
               .required('Enter Current Password'),
               newPassword: yup
               .string()
               .strict(true)
-              .matches(/[a-zA-Z0-9]+$/, 'Password cannot contain Special Characters')
-              .trim('Name cannot contain Special Characters or Numbers')
+              .matches( /^.*(?=.{8,})((?=.*[!@#$%^&*()\-_=+{};:,<.>]){1})(?=.*\d)((?=.*[a-z]){1})((?=.*[A-Z]){1}).*$/, 'Password must be 8 characters long and contain One(1) Lower Case Letter, Upper Case Letter, Number, and Special Character.')              .trim('Name cannot contain Special Characters or Numbers')
               .required('Password is Required'),
               confirmNewPassword: yup
               .string()
               .strict(true)
-              .matches(/[a-zA-Z0-9]+$/, 'Password cannot contain Special Characters')
-              .trim('Name cannot contain Special Characters or Numbers')
+              .matches( /^.*(?=.{8,})((?=.*[!@#$%^&*()\-_=+{};:,<.>]){1})(?=.*\d)((?=.*[a-z]){1})((?=.*[A-Z]){1}).*$/, 'Password must be 8 characters long and contain One(1) Lower Case Letter, Upper Case Letter, Number, and Special Character.')              .trim('Name cannot contain Special Characters or Numbers')
               .required('You Must Confirm Password')
               .when("newPassword", {
                   is: val => (val && val.length > 0 ? true : false),
@@ -397,8 +394,7 @@ render()
             currentPasswordEmail: yup
               .string()
               .strict(true)
-              .matches(/[a-zA-Z0-9]+$/, 'Password contains Special Characters')
-              .trim('Password contains Special Characters')
+              .matches( /^.*(?=.{8,})((?=.*[!@#$%^&*()\-_=+{};:,<.>]){1})(?=.*\d)((?=.*[a-z]){1})((?=.*[A-Z]){1}).*$/, 'Password must be 8 characters long and contain One(1) Lower Case Letter, Upper Case Letter, Number, and Special Character.')              .trim('Password contains Special Characters')
               .required('Enter Current Password'),
           })
         

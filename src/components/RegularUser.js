@@ -796,7 +796,7 @@ export default class RegularUser extends Component {
  <Text style={{ color: 'white', fontWeight: 'normal', fontSize: 15 }}>
  You are a {this.state.userType}.
  </Text>
- <TouchableOpacity disabled={this.state.isIncidentReady} onPress={this.signOutUser}>
+ <TouchableOpacity /*disabled={this.state.isIncidentReady}*/ onPress={this.signOutUser}>
  <Text style={{ color: 'white', fontSize: 30 }}>
  Log Out
  </Text>
@@ -811,7 +811,7 @@ export default class RegularUser extends Component {
  }
 
  usePinLocation = () => 
- {
+ { 
  Alert.alert("Long Press Marker and Move to Desired Location!")
  this.setState({incidentLocation:'Pinned Location',
  isSettled:false,

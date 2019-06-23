@@ -8,6 +8,8 @@ import RegularUser from './src/components/RegularUser';
 import Responder from './src/components/Responder';
 import LoadingScreen from './src/components/LoadingScreen';
 import Login from './src/components/Login';
+import forgetPassword from './src/components/forgetPassword'
+
 import Register from './src/components/Register';
 import OpenAppSettings from 'react-native-app-settings'
 import 'babel-polyfill';
@@ -236,6 +238,7 @@ export default class App extends Component {
           <Stack key="root" hideNavBar={true}>
             <Scene key="loading" component={LoadingScreen} initial={true} title="Loading" />
             <Scene key="Login" component={Login} title="Login" />
+            <Scene key="forgetPassword" component={forgetPassword} title="forgetPassword" />
             <Scene key="signup" component={Register} title="Register" />
             <Scene key="RegularUser" component={RegularUser} title="RegularUser" />
             <Scene key="Volunteer" component={Volunteer} title="Volunteer" />

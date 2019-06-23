@@ -71,16 +71,18 @@ const medicalProfessionOptions = [
 ]
 
 const durationServiceOptions = [
-    {label: '1 year', value: 1},
-    {label: '2 years', value: 2},
-    {label: '3 years', value: 3},
-    {label: '4 years', value: 4},
-    {label: '5 years', value: 5},
-    {label: '6 years', value: 6},
-    {label: '7 years', value: 7},
-    {label: '8 years', value: 8},
-    {label: '9 years', value: 9},
-    {label: '10 years', value: 10},
+    {label: 'Less than 1 year', value: 2},
+    {label: '1-3 years', value: 4},
+    {label: '3-5 years', value: 6},
+    {label: '5-7 years', value: 7},
+    {label: '7-10 years', value: 8},
+    {label: 'More than 10 years', value: 10},
+  
+]
+
+const Gender=[
+    {label: 'Male', value:'Male'},
+    {label: 'Female', value:'Female'}
 ]
 
 
@@ -249,7 +251,8 @@ class Register extends Component {
         promise.then(user => {
             this.doSendEmailVerification()
             let points=this.computePoints()
-            Alert.alert(JSON.stringify(`Account ${values.email} has been created`))
+            Alert.alert(JSON.stringify(`Account ${values.email} has been created, 
+            Please check your Email Address to Verify your account!`))
             Keyboard.dismiss();
             let app = fire2.database().ref('users/' + user.user.uid);
             let unverified = fire2.database().ref('unverifiedMobileUsers/' + user.user.uid);
@@ -301,7 +304,9 @@ class Register extends Component {
                 password: values.password,
                 firstName: values.firstName,
                 lastName: values.lastName,
-                sex: values.gender,
+                gender: values.gender,
+                incidentId:'',
+                isAccepted:false,
                 contactNumber: values.contactNumber,
                 isMobile: true,
                 isVerified: false,
@@ -330,7 +335,11 @@ class Register extends Component {
             value: null,
             color: '#9EA0A4',
           };
-
+          const placeholderGender = {
+            label: 'Gender',
+            value: null,
+            color: '#9EA0A4',
+          };
           const placeholderCertification = {
             label: 'Select a Medical Certification',
             value: null,
@@ -361,39 +370,42 @@ class Register extends Component {
                     yup.object().shape({
                         firstName: yup
                             .string()
-                            .matches(/[a-zA-Z]/, 'Name cannot contain Special Characters or Numbers')
+                            .matches(/[a-zA-Z]+$/, 'Name cannot contain Special Characters or Numbers')
                             .required('First Name is Required'),
                         lastName: yup
                             .string()
                             .strict(true)
-                            .matches(/[a-zA-Z]/, 'Name cannot contain Special Characters or Numbers')
+                            .matches(/[a-zA-Z]+$/, 'Name cannot contain Special Characters or Numbers')
                             .trim("Name cannot contain Special Characters or Numbers")
                             .required('Last Name is Required'),
-                        gender: yup
-                            .string()
-                            .strict(true)
-                            .matches(/[a-zA-Z]/, 'Name cannot contain Special Characters or Numbers')
-                            .trim("Name cannot contain Special Characters or Numbers")
-                            .required('Sex is Required'),
+                  
                         email: yup
                             .string()
                             .email('Invalid Email Format')
                             .required('Email Address is Required'),
-                        contactNumber: yup
-                            .number()
-                            .typeError('Only Number Inputs Allowed')
-                            .required('Contact Number is Required'),
-                        password: yup
+                        // contactNumber: yup
+                        //     .number()
+                        //     .matches(/^(09|\+639)\d{9}$/,'Only Philippine Mobile Numbers are Allowed')
+                        //     .typeError('Only Number Inputs Allowed')
+                        //     .required('Contact Number is Required'),
+                        contactNumber:yup
+                            .string()
+                            .matches( /^(09|\+639)\d{9}$/,'only Philippine Mobile Numbers are allowed')
+                            .required('Contact Number is Required')
+                            .trim('Contact Number does not allow Spaces'),
+                            
+
+                        password: yup                         
                             .string()
                             .strict(true)
-                            .matches(/[a-zA-Z0-9]/, 'Password cannot contain Special Characters')
-                            .trim('Name cannot contain Special Characters or Numbers')
+                            .matches( /^.*(?=.{8,})((?=.*[!@#$%^&*()\-_=+{};:,<.>]){1})(?=.*\d)((?=.*[a-z]){1})((?=.*[A-Z]){1}).*$/, 'Password must be 8 characters long and contain One(1) Lower Case Letter, Upper Case Letter, Number, and Special Character.')
+                            .trim('Password cannot contain Spaces')
                             .required('Password is Required'),
                         confirmPassword: yup
                             .string()
                             .strict(true)
-                            .matches(/[a-zA-Z0-9]/, 'Password cannot contain Special Characters')
-                            .trim('Name cannot contain Special Characters or Numbers')
+                            .matches(/^.*(?=.{8,})((?=.*[!@#$%^&*()\-_=+{};:,<.>]){1})(?=.*\d)((?=.*[a-z]){1})((?=.*[A-Z]){1}).*$/, 'Password must be 8 characters long and contain One(1) Lower Case Letter, Upper Case Letter, Number, and Special Character.')
+                            .trim('Password cannot contain Spaces')
                             .required('You Must Confirm Password')
                             .when("password", {
                                 is: val => (val && val.length > 0 ? true : false),
@@ -452,7 +464,7 @@ class Register extends Component {
                             placeholder="Contact Number"
                             placeholderTextColor="#ffffff"
                             selectionColor="#fff"
-                            keyboardType="email-address"
+                            keyboardType="number-pad"
                             value={values.contactNumber}
                             onChangeText={handleChange('contactNumber')}
                             onBlur={() => setFieldTouched('contactNumber')}
@@ -460,19 +472,18 @@ class Register extends Component {
                         {touched.contactNumber && errors.contactNumber &&
                             <Text style={{ fontSize: 15, color: 'red' }}>{errors.contactNumber}</Text>
                         }
-                        <TextInput style={styles.inputBox}
-                            underlineColorAndroid='rgba(0,0,0,0)'
-                            placeholder="Sex"
-                            placeholderTextColor="#ffffff"
-                            selectionColor="#fff"
-                            keyboardType="email-address"
-                            value={values.gender}
-                            onChangeText={handleChange('gender')}
-                            onBlur={() => setFieldTouched('gender')}
-                        />
-                        {touched.gender && errors.gender &&
-                            <Text style={{ fontSize: 15, color: 'red' }}>{errors.gender}</Text>
-                        }
+                    
+                         <RNPickerSelect
+                            placeholder={placeholderGender}
+                          items={Gender}
+                          onValueChange={value => {
+                            this.setState({
+                                gender: value           
+                             });
+                          }}
+                          style={pickerSelectStyles}
+                          value={this.state.medicalDegree}
+                          />
                         <TextInput style={styles.inputBox}
                             underlineColorAndroid='rgba(0,0,0,0)'
                             placeholder="Password"
@@ -638,7 +649,7 @@ class Register extends Component {
                     
                         <RadioGroup radioButtons={this.state.data} onPress={this.userType} />
                         {this.state.user_type==="Volunteer" ? <TouchableOpacity style={styles.button}
-                            disabled={(!this.state.medicalProfession)||(!isValid)}
+                            disabled={(!this.state.medicalProfession)||(!isValid)||(!this.state.gender)}
                             onPress={handleSubmit}>
 
                             <Text style={styles.buttonText}>
@@ -646,7 +657,7 @@ class Register extends Component {
                     </Text>
 
                         </TouchableOpacity> : <TouchableOpacity style={styles.button}
-                            disabled={(!isValid)}
+                            disabled={(!isValid)||(!this.state.gender)}
                             onPress={handleSubmit}>
 
                             <Text style={styles.buttonText}>

@@ -165,10 +165,11 @@ export default class Volunteer extends Component {
 
         app.database().ref(`incidents/${incidentID}`).update({
             isRespondingVolunteer: true,
+            isRespondingVolunteerShown:true,
             image_uri: this.state.image_uri,
             unrespondedVolunteer: false,
             volunteerResponding: this.state.userId,
-            timeReceiveVolunteer: date1,
+            volunteerRespondingReceived: date1,
             originalVolunteerName:this.state.firstName+' '+this.state.lastName
 
         });
@@ -182,8 +183,6 @@ export default class Volunteer extends Component {
             isAccepted: true,
         })
         this.getRouteDirection(destinationPlaceId, incidentLocation);
-
-       
     }
 
     arrivedLocation = () => {
@@ -194,32 +193,34 @@ export default class Volunteer extends Component {
         let incidentID = this.state.incidentId;
         console.log("incidentID on arrived Location", incidentID);
         app.database().ref(`incidents/${incidentID}`).update({
-            timeVolunteerResponded: date1
+            volunteerRespondingArrived:date1,
+            isArrivedVolunteerShown:true,
         });
     }
 
-    additionalDispatchedVolunteer = (incidentID, userId, destinationPlaceId, incidentLocation) => {
-        var time = Date(Date.now());
-        date = time.toString();
+    // additionalDispatchedVolunteer = (incidentID, userId, destinationPlaceId, incidentLocation) => {
+    //     var time = Date(Date.now());
+    //     date = time.toString();
 
 
-        console.log("OTHER DISPATCHED", this.state.userId);
-        this.setState({
-            isIncidentReady: true,
-            dispatchedVolunteer: true,
-        })
+    //     console.log("OTHER DISPATCHED", this.state.userId);
+    //     this.setState({
+    //         isIncidentReady: true,
+    //         dispatchedVolunteer: true,
+    //     })
 
-        app.database().ref(`incidents/${incidentID}/additionalDispatchedVolunteer/${userId}`).update({
-            timeArrived: '',
-            timeReceived: date,
-        });
+    //     app.database().ref(`incidents/${incidentID}/multipleVolunteers/${userId}`).update({
+    //         volunteerName: this.state.firstName + ' ' + this.state.lastName,
+    //         timeArrived: '',
+    //         timeReceived: date,
+    //     });
 
-        app.database().ref(`mobileUsers/Volunteer/${userId}`).update({
-            isAccepted: true,
-        });
+    //     app.database().ref(`mobileUsers/Volunteer/${userId}`).update({
+    //         isAccepted: true,
+    //     });
 
-        this.getRouteDirection(destinationPlaceId, incidentLocation);
-    }
+    //     this.getRouteDirection(destinationPlaceId, incidentLocation);
+    // }
 
     arrivedLocationDispatched = () => {
         var time = Date(Date.now());
@@ -228,21 +229,7 @@ export default class Volunteer extends Component {
         let incidentID = this.state.incidentId;
         let userId = this.state.userId;
         console.log("incidentID on arrived Location", incidentID, userId);
-        app.database().ref(`incidents/${incidentID}/additionalDispatchedVolunteer/${userId}`).update({
-            timeArrived: date,
-        });
-    }
-
-    
-
-    arrivedLocationDispatched = () => {
-        var time = Date(Date.now());
-        date = time.toString();
-
-        let incidentID = this.state.incidentId;
-        let userId = this.state.userId;
-        console.log("incidentID on arrived Location", incidentID, userId);
-        app.database().ref(`incidents/${incidentID}/additionalDispatchedVolunteer/${userId}`).update({
+        app.database().ref(`incidents/${incidentID}/multipleVolunteers/${userId}`).update({
             timeArrived: date,
         });
     }
@@ -283,9 +270,42 @@ export default class Volunteer extends Component {
         let incidentID = this.state.incidentId;
         let userId = this.state.userId;
         console.log("incidentID on arrived Location", incidentID, userId);
+        
+        app.database().ref(`incidents/${incidentID}}`).update({
+            isArrivedAddVolunteerShown:true
+        });
+
         app.database().ref(`incidents/${incidentID}/requestVolunteers/${userId}`).update({
             timeArrived: date1,
         });
+    }
+
+    additionalDispatchedVolunteer = (incidentID, userId, destinationPlaceId, incidentLocation) => {
+        var time = Date(Date.now());
+        date = time.toString();
+
+
+        console.log("OTHER DISPATCHED", this.state.userId);
+        this.setState({
+            isIncidentReady: true,
+            dispatchedResponder: true,
+        })
+
+        app.database().ref(`incidents/${incidentID}`).update({
+            isRespondingAddVolunteerShown:true
+        });
+
+        app.database().ref(`incidents/${incidentID}/multipleVolunteers/${userId}`).update({
+            name:this.state.firstName+' '+this.state.lastName,
+            timeArrived: '',
+            timeReceived: date,
+        });
+
+        app.database().ref(`mobileUsers/Volunteer/${userId}`).update({
+            isAccepted: true,
+        });
+
+        this.getRouteDirection(destinationPlaceId, incidentLocation);
     }
 
     isRejected = () => {
@@ -310,6 +330,10 @@ export default class Volunteer extends Component {
             // isRequestingResponders: true,
             isIncidentReady: true,
             requestVolunteers: true,
+        });
+
+        app.database().ref(`incidents/${incidentID}/`).update({
+            isRespondingAddVolunteerShown:true
         });
 
         app.database().ref(`incidents/${incidentId}/requestVolunteers/${userId}`).update({
@@ -359,7 +383,7 @@ export default class Volunteer extends Component {
                     this.userIncidentId = app.database().ref(`incidents/${incidentID}`);
                     this.userIncidentId.on('value', (snapshot) => {
                         incidentDetails = snapshot.val() || null;
-                        //var originalVolunteerName=incidentDetails.originalVolunteerName;
+                        var originalVolunteerName=incidentDetails.originalVolunteerName;
                         var incidentType = incidentDetails.incidentType;
                         var incidentLocation = incidentDetails.incidentLocation;
                         var markerLat = incidentDetails.coordinates.lat;

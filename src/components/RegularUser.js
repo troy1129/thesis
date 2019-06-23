@@ -353,10 +353,18 @@ export default class RegularUser extends Component {
  })
  }
 
+ clearSettled = () => {
+    var regularListen = app.database().ref(`users/${this.state.userId}`);
+    regularListen.update({
+    incidentId: '',
+    })
+
+ }
+
  incidentSettled = () => {
 
 
- this.setState({ isSettled: true, isIncidentReady: false, hasResponderAlerted: false, hasVolunteerAlerted: false ,incidentLocation:'',pinUpdate:false});
+ this.setState({ isSettled: true, isIncidentReady: false, hasResponderAlerted: false, hasVolunteerAlerted: false ,incidentLocation:'',pinUpdate:false, incidentID:''});
  this.setState({ markerCoords: null });
 
  Alert.alert(
@@ -364,7 +372,7 @@ export default class RegularUser extends Component {
  `Thank you for reporting! `
  ,
  [
- { text: "Ok", onPress: () => { console.log("ok") } },
+ { text: "Ok", onPress: () => { this.clearSettled() } },
  ],
  { cancelable: false }
  );
@@ -598,32 +606,53 @@ export default class RegularUser extends Component {
  var coordLat = coords2.latitude;
  var coordLng = coords2.longitude;
  app.database().ref("/incidents").push({
+     
+ destinationPlaceId: this.state.destinationPlaceId,
  incidentType: this.state.incidentType,
  incidentLocation: this.state.incidentLocation,
  incidentNote:this.state.incidentNote,
- unresponded: true,
+
  isResponding: false,
+
  isShown: false,
  isSettled: false,
+
+ isRequestingResponders: false,
+ isRequestingVolunteers: false,
+
+ isRespondingResponderShown:false,
+ isRespondingVolunteerShown:false,
+
+ isRespondingAddResponderShown: false,
+ isRespondingAddVolunteerShown: false,
+
+ isArrivedResponderShown:false,
+ isArrivedVolunteerShown:false,
+
+ isArrivedAddResponderShown:false,
+ isArrivedAddVolunteerShown:false,
+
  markerLat:this.state.markerLat,
  markerLng:this.state.markerLng,
- reportedBy: this.state.userId,
+
+ reporterUID: this.state.userId,
  reporterName: fullName,
+
  timeReceived: date1,
- timeResponded: '',
  image_uri: this.state.image_uri,
+
  responderResponding: '',
  volunteerResponding: '',
+
+ originalResponderName: '',
+ originalVolunteerName:'',
+
  coordinates: {
  lat: coordLat,
  lng: coordLng
  },
- destinationPlaceId: this.state.destinationPlaceId,
- isRequestingResponders: false,
- isRequestingVolunteers: false,
- originalVolunteerName:'',
- requestResponders:'',
- requestVolunteers:'',
+
+ unresponded: true,
 
 
  }).then((snap) => {

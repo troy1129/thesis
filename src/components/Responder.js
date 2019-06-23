@@ -90,8 +90,8 @@ export default class Responder extends Component {
             reportedBy: '',
             timeReceived: '',
             timeResponded: '',
-            respondingRes: '',
-            respondingVol: '',
+            responderResponding: '',
+            volunteerResponding: '',
             requestResponders: false,
             coordinates: {
                 lng: null,
@@ -253,7 +253,7 @@ export default class Responder extends Component {
 
     }
 
-    changeIncidentState = (incidentType, incidentLocation, incidentID, destinationPlaceId, userId, image_uri, respondingVolName) => {
+    changeIncidentState = (incidentType, incidentLocation, incidentID, destinationPlaceId, userId, image_uri, originalVolunteerName) => {
 
         var time = Date(Date.now());
         date = time.toString();
@@ -264,11 +264,10 @@ export default class Responder extends Component {
             isRespondingResponder: true,
             isRespondingResponderShown:true,
             unrespondedResponder: false,
-            respondingRes: this.state.userId,
-            respondingResName: this.state.firstName + ' ' + this.state.lastName,
+            responderResponding: this.state.userId,
+            originalResponderName: this.state.firstName + ' ' + this.state.lastName,
             image_uri:this.state.image_uri,
-            timeReceived: date,
-            originalResponderName:this.state.firstName+' '+this.state.lastName
+            responderRespondingReceived: date,
         });
 
         app.database().ref(`mobileUsers/Responder/${userId}`).update({
@@ -292,8 +291,8 @@ export default class Responder extends Component {
 
         console.log("incidentID on arrived Location", incidentID);
         app.database().ref(`incidents/${incidentID}`).update({
-            respondingResArrived:date,
-            isShownResArrived:true,
+            responderRespondingArrived: date,
+            isArrivedResponderShown:true,
         });
     }
 
@@ -306,6 +305,11 @@ export default class Responder extends Component {
             incidentId:'',
             isAccepted:false,
         })
+
+        app.database().ref(`incidents/${incidentID}`).update({
+            isShown:true,
+        });
+
         var responderListen = app.database().ref(`mobileUsers/Responder/${userId}`)
         responderListen.update({
             incidentID: '',
@@ -331,7 +335,7 @@ export default class Responder extends Component {
             originalResponder: false,
             isRequestingResponders: false,
             requestResponders: false,
-            incidentId: "",
+            incidentID: "",
             isAccepted: false,
             pinUpdate:false,
             didSettle:true,
@@ -347,9 +351,6 @@ export default class Responder extends Component {
      
     }
 
-
-
-
     arrivedLocationRequested = () => {
         var time = Date(Date.now());
         date = time.toString();
@@ -359,7 +360,8 @@ export default class Responder extends Component {
         let incidentID = this.state.incidentId;
         let userId = this.state.userId;
         console.log("incidentID on arrived Location", incidentID, userId);
-        app.database().ref(`incidents/${incidentID}/responderRespondingAdd/${userId}`).update({
+
+        app.database().ref(`incidents/${incidentID}/requestedResponders/${userId}`).update({
             timeArrived: date,
         });
     }
@@ -395,18 +397,19 @@ export default class Responder extends Component {
         })
         
         app.database().ref(`incidents/${incidentID}`).update({
-            isShownRespAddReceived:true,
+            isRespondingAddResponderShown: true,
         })
 
-        app.database().ref(`incidents/${incidentID}/responderRespondingAdd/${userId}`).update({
-            name:this.state.firstName+ '' +this.state.lastName,
-            timeArrived: '',
+        app.database().ref(`incidents/${incidentID}/requestedResponders/${userId}`).update({
+            name:this.state.firstName+ ' ' +this.state.lastName,
+            timeArrived: ' ',
             timeReceived: date,
         });
 
         app.database().ref(`mobileUsers/Responder/${userId}`).update({
             isAccepted: true,
         });
+
         this.getRouteDirection(destinationPlaceId, incidentLocation);
         
 }
@@ -443,7 +446,7 @@ export default class Responder extends Component {
         })
 
         app.database().ref(`incidents/${incidentID}/multipleResponders/${userId}`).update({
-            responderName:this.state.firstName+' '+this.state.lastName,
+            name:this.state.firstName+' '+this.state.lastName,
             timeArrived: '',
             timeReceived: date,
         });
@@ -453,9 +456,6 @@ export default class Responder extends Component {
         });
 
         this.getRouteDirection(destinationPlaceId, incidentLocation);
-
-        
-
     }
 
     setModalVisible(visible) {
@@ -509,12 +509,12 @@ export default class Responder extends Component {
                     var markerLat = incidentDetails.coordinates.lat;
                     var markerLng = incidentDetails.coordinates.lng;
                     var destinationPlaceId = incidentDetails.destinationPlaceId;
-                    var respondingRes = incidentDetails.respondingRes;
+                    var responderResponding = incidentDetails.responderResponding;
                     var isSettled = incidentDetails.isSettled;
                     var isRequestingResponders = incidentDetails.isRequestingResponders;
 
                     //REGULAR USER SENT REPORT, ORIGINAL RESPONDER
-                    if (incidentID !== "" && respondingRes === "" && isSettled === false) {
+                    if (incidentID !== "" && responderResponding === "" && isSettled === false) {
                         console.log("ARGUMENT 1");
                         Alert.alert(
                             "INCIDENT DETAILS ",
@@ -529,7 +529,7 @@ export default class Responder extends Component {
                         that.setState({ originalResponder: true, isIncidentReady: true, incidentType, incidentLocation, destinationPlaceId, userId, incidentId: incidentID, image_uri,markerLat,markerLng,incidentNote,originalVolunteerName,originalResponderName });
                     }
                     //SAME RESPONDER SENT REPORT, ORIGINAL RESPONDER
-                    else if (incidentID !== "" && respondingRes === userId && isSettled === false) {
+                    else if (incidentID !== "" && responderResponding === userId && isSettled === false) {
                         console.log("ARGUMENT 2");
                         console.log("same responder");
 
@@ -538,7 +538,7 @@ export default class Responder extends Component {
                     }
 
                     //ASK FOR ADDITIONAL RESPONDER
-                    else if (incidentID !== "" && respondingRes !== userId && isRequestingResponders === true && this.state.requestResponders === false && isSettled === false) {
+                    else if (incidentID !== "" && responderResponding !== userId && isRequestingResponders === true && this.state.requestResponders === false && isSettled === false) {
 
                         console.log("ARGUMENT 3");
                         Alert.alert(
@@ -547,15 +547,15 @@ export default class Responder extends Component {
                                                  Incident Location: ${incidentLocation}`
                             ,
                             [
-                                { text: "Respond", onPress: () => { that.isRequestingResponders(incidentID, userId, destinationPlaceId, incidentLocation, image_uri,markerLat,markerLng,incidentNote,respondingVolName) } },
+                                { text: "Respond", onPress: () => { that.isRequestingResponders(incidentID, userId, destinationPlaceId, incidentLocation, image_uri,markerLat,markerLng,incidentNote,originalVolunteerName) } },
                             ],
                             { cancelable: false }
                         );
-                        that.setState({ incidentType, incidentLocation, destinationPlaceId, incidentId: incidentID, userId, image_uri,markerLat,markerLng,incidentNote,respondingVolName});
+                        that.setState({ incidentType, incidentLocation, destinationPlaceId, incidentId: incidentID, userId, image_uri,markerLat,markerLng,incidentNote,originalVolunteerName});
                     }
 
                     //RESPONDER WHO SENT REPORT SETTLES REPORT
-                    else if (incidentID !== "" && respondingRes === userId && isSettled === true) {
+                    else if (incidentID !== "" && responderResponding === userId && isSettled === true) {
                         console.log("ARGUMENT 6");
                         that.setState({isIncidentReady: false, incidentType, incidentLocation, destinationPlaceId, incidentId: incidentID, userId,markerLat:null,markerLng:null});
                         Alert.alert(
@@ -571,15 +571,15 @@ export default class Responder extends Component {
                         );
                         this.setState({destinationPlaceId:'',pinUpdate:false})
                     }
-                    else if (incidentID !== "" && respondingRes !== userId && isRequestingResponders === true && this.state.requestResponders === true && isSettled === false) {
+                    else if (incidentID !== "" && responderResponding !== userId && isRequestingResponders === true && this.state.requestResponders === true && isSettled === false) {
                         //condition requested responders
                         console.log("ARGUMENT 5");
-                        that.setState({ isSettled: false, isIncidentReady: true, incidentType, incidentLocation, destinationPlaceId, incidentId: incidentID, userId , image_uri,markerLat,markerLng,incidentNote,respondingVolName});
+                        that.setState({ isSettled: false, isIncidentReady: true, incidentType, incidentLocation, destinationPlaceId, incidentId: incidentID, userId , image_uri,markerLat,markerLng,incidentNote,originalVolunteerName});
                         that.getRouteDirection(destinationPlaceId, incidentLocation);
                     }
                     
                     //Additional Responder Settles Report
-                    else if (incidentID !== "" && respondingRes !== userId && isRequestingResponders === true && this.state.requestResponders === true && isSettled === true) {
+                    else if (incidentID !== "" && responderResponding !== userId && isRequestingResponders === true && this.state.requestResponders === true && isSettled === true) {
                         console.log("ARGUMENT 6");
                         that.setState({ isSettled: true, isIncidentReady: false, incidentType, incidentLocation, destinationPlaceId, incidentId: incidentID, userId, markerLat:null,markerLng:null});
                         Alert.alert(
@@ -594,7 +594,7 @@ export default class Responder extends Component {
                             { cancelable: false }
                         );
                     }
-                    else if (incidentID !== "" && respondingRes !== userId && isRequestingResponders === false && this.state.requestResponders === false && isSettled === false) {
+                    else if (incidentID !== "" && responderResponding !== userId && isRequestingResponders === false && this.state.requestResponders === false && isSettled === false) {
                         console.log("ARGUMENT 7: Multiple Dispatched, Initial");
                         if (that.state.dispatchedResponder === false) {
                             Alert.alert(
@@ -604,11 +604,11 @@ export default class Responder extends Component {
                                                                          `
                                 ,
                                 [
-                                    { text: "Respond", onPress: () => { that.additionalDispatchedResponders(incidentID, userId, destinationPlaceId, incidentLocation, image_uri,markerLat,markerLng,incidentNote,respondingVolName) } },
+                                    { text: "Respond", onPress: () => { that.additionalDispatchedResponders(incidentID, userId, destinationPlaceId, incidentLocation, image_uri,markerLat,markerLng,incidentNote,originalVolunteerName) } },
                                 ],
                                 { cancelable: false }
                             );
-                            that.setState({ incidentType, incidentLocation, destinationPlaceId, incidentId: incidentID, userId, image_uri,markerLat,markerLng,respondingVolName});
+                            that.setState({ incidentType, incidentLocation, destinationPlaceId, incidentId: incidentID, userId, image_uri,markerLat,markerLng,originalVolunteerName});
                         }
                         this.getRouteDirection(destinationPlaceId, incidentLocation);
                     }
@@ -817,58 +817,58 @@ export default class Responder extends Component {
         var coordLat = coords2.latitude;
         var coordLng = coords2.longitude;
         app.database().ref("/incidents").push({
-            reporterName: fullName,
+            destinationPlaceId: this.state.destinationPlaceId,
             incidentType: this.state.incidentType,
             incidentLocation: this.state.incidentLocation,
-            unresponded: true,
-            isResponding: false,
-            markerLat:this.state.markerLat,
-            markerLng:this.state.markerLng,
+            incidentNote:this.state.incidentNote,
+           
+            isResponding: true,
+           
+            isShown: false,
             isSettled: false,
-            incidentNote:this.state.incidentNote,
-            originalVolunteerName:this.state.originalVolunteerName,
-            image_uri:this.state.image_uri,
-            reportedBy: this.state.firstName+' '+this.state.lastName,
-            timeReceived: date,
-            timeResponderResponded: '',
-            responderResponding: this.state.userId,
-            originalResponderName:this.state.firstName+' '+this.state.lastName,
-            volunteerResponding: '',
-            coordinates: {
-                lat: coordLat,
-                lng: coordLng
-            },
-            destinationPlaceId:this.state.destinationPlaceId,
-            image_uri:this.state.image_uri,
-            incidentLocation: this.state.incidentLocation,
-            incidentNote:this.state.incidentNote,
-            incidentType: this.state.incidentType,
-            isResponding:true,
-            isRedundantReport:false, //For identifying redundant reports
-            isRequestingResponders:false, //Flag for responder to request additional responders
-            isRequestingVolunteers:false, //Flag for responder to request additional volunteers
-            isRespondingResponder:true, //Flag if naa naka respond nga responder
-            isRespondingVolunteer:false, //Flag if naa naka respond nga volunteer
-            isRespondingResponderShown:true, //If naka click 'Respond' ang responder
-            isRespondingVolunteerShown:false, //If naka click 'Accept' or 'Reject' ang volunteer
-            isShownRespAddArrived:false, //If naka click 'OK' sa arrival ang additional responder
-            isShownRespAddReceived:false, //If naka click 'OK' sa received ang additional responder
-            isShownRespArrived:false, //If naka click 'OK' sa arrival ang responder
-            isShownSettled: false, //If naka 'Ok' sa settle alert
+           
+            isRequestingResponders: false,
+            isRequestingVolunteers: false,
+           
+            isRespondingResponderShown:true,
+            isRespondingVolunteerShown:false,
+
+            isRespondingAddResponderShown: false,
+            isRespondingAddVolunteerShown: false,
+           
+            isArrivedResponderShown:false,
+            isArrivedVolunteerShown:false,
+
+            isArrivedAddResponderShown:false,
+            isArrivedAddVolunteerShown:false,
+           
             markerLat:this.state.markerLat,
             markerLng:this.state.markerLng,
-            timeReceived:date,
-            reporterName: fullName, 
+           
             reporterUID: this.state.userId,
-            respondingRes:this.state.userId, //responderResponding,
-            respondingResName: fullName,
-            respondingResArrived:'',
-            respondingResReceived:date, //TimeResponderResponded
-            respondingVol:'', //volunteerResponding
-            respondingVolName:'',
-            respondingVolArrived:'',
-            respondingVolReceived:'',
-            unresponded:false //Flag if incident is unresponded or not
+            reporterName: fullName,
+           
+            timeReceived: date1,
+            image_uri: this.state.image_uri,
+           
+            responderResponding: this.state.userId,
+            volunteerResponding: '',
+
+            responderRespondingReceived: date,
+            responderRespondingArrived: '',
+
+            volunteerRespondingReceived:'',
+            volunteerRespondingArrived:'',
+           
+            originalResponderName: fullName,
+            originalVolunteerName:'',
+           
+            coordinates: {
+            lat: coordLat,
+            lng: coordLng
+            },
+           
+            unresponded: true,
         }).then((snap) => {
             const incidentUserKey = snap.key
             this.setState({ incidentUserKey })
@@ -878,7 +878,7 @@ export default class Responder extends Component {
             incidentType: '',
             incidentLocation: '',
             unresponded: false,
-            respondingVolName:'',
+            originalVolunteerName:'',
             isResponding: null,
             isSettled: null,
             pinUpdate:false,
@@ -888,7 +888,7 @@ export default class Responder extends Component {
             timeReceived: '',
             timeResponded: '',
             respondingRes,
-            respondingVol: '',
+            volunteerResponding: '',
             coordinates: {
                 lat: null,
                 lng: null

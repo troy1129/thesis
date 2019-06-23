@@ -258,20 +258,11 @@ export default class Responder extends Component {
 
 
         app.database().ref(`incidents/${incidentID}`).update({
-<<<<<<< HEAD
-            isRespondingResponder: true,
-=======
             isResponding:true,
             isRespondingResponder:true,
->>>>>>> 7cc680a3d2571a6d5f128461013899f984bc2f56
             unrespondedResponder: false,
             responderResponding: this.state.userId,
             image_uri:this.state.image_uri,
-<<<<<<< HEAD
-            timeReceived: date,
-            originalResponderName:this.state.firstName+' '+this.state.lastName
-        });
-=======
             responderRespondingReceived: date,
         }).then(
             setTimeout(
@@ -279,7 +270,6 @@ export default class Responder extends Component {
                 isRespondingResponderShown:true,},5000))
             
          );
->>>>>>> 7cc680a3d2571a6d5f128461013899f984bc2f56
 
         app.database().ref(`mobileUsers/Responder/${userId}`).update({
             isAccepted: true,
@@ -302,10 +292,6 @@ export default class Responder extends Component {
         let incidentID = this.state.incidentId;
         console.log("incidentID on arrived Location", incidentID);
         app.database().ref(`incidents/${incidentID}`).update({
-<<<<<<< HEAD
-            timeResponderResponded: date,
-        });
-=======
             responderRespondingArrived: date,
             isArrivedResponder:true,
         }).then(
@@ -313,7 +299,6 @@ export default class Responder extends Component {
                 app.database().ref(`incidents/${incidentID}`).update({
                 isArrivedResponderShown:true,},5000))
          );
->>>>>>> 7cc680a3d2571a6d5f128461013899f984bc2f56
     }
 
     clearStates = () => {
@@ -343,18 +328,12 @@ export default class Responder extends Component {
         responderListen.update({
             incidentID: '',
             isAccepted: false,
-<<<<<<< HEAD
-        }).then(
-            this._toggleModal2()
-        )
-=======
         }).then(()=>{
             if(this.state.didSettle){
                 this._toggleModal2
             }
         })
 
->>>>>>> 7cc680a3d2571a6d5f128461013899f984bc2f56
     }
 
     // clearSettledAdditional = () => {
@@ -407,13 +386,9 @@ export default class Responder extends Component {
 
         app.database().ref(`incidents/${incidentID}`).update({
             isSettled: true,
-<<<<<<< HEAD
-            isShown: true,
-=======
             timeSettled: date,
             unresponded:false,
             isResponding:false
->>>>>>> 7cc680a3d2571a6d5f128461013899f984bc2f56
         });
      
     }
@@ -460,15 +435,9 @@ export default class Responder extends Component {
             requestResponders: true,
         })
 
-<<<<<<< HEAD
-        app.database().ref(`incidents/${incidentId}/requestResponders/${userId}`).update({
-            name:this.state.firstName+ '' +this.state.lastName,
-            timeArrived: '',
-=======
         app.database().ref(`incidents/${incidentId}/requestedResponders/${userId}`).update({
             name:this.state.firstName+ ' ' +this.state.lastName,
             timeArrived: ' ',
->>>>>>> 7cc680a3d2571a6d5f128461013899f984bc2f56
             timeReceived: date,
         });
 
@@ -891,34 +860,6 @@ export default class Responder extends Component {
         var coordLat = coords2.latitude;
         var coordLng = coords2.longitude;
         app.database().ref("/incidents").push({
-<<<<<<< HEAD
-            reporterName: fullName,
-            incidentType: this.state.incidentType,
-            incidentLocation: this.state.incidentLocation,
-            unresponded: true,
-            isResponding: false,
-            markerLat:this.state.markerLat,
-            markerLng:this.state.markerLng,
-            isSettled: false,
-            incidentNote:this.state.incidentNote,
-            originalVolunteerName:this.state.originalVolunteerName,
-            image_uri:this.state.image_uri,
-            reportedBy: this.state.firstName+' '+this.state.lastName,
-            timeReceived: date,
-            timeResponderResponded: '',
-            responderResponding: this.state.userId,
-            originalResponderName:this.state.firstName+' '+this.state.lastName,
-            volunteerResponding: '',
-            coordinates: {
-                lat: coordLat,
-                lng: coordLng
-            },
-            destinationPlaceId: this.state.destinationPlaceId,
-            isRequestingResponders: false,
-            isRequestingVolunteers: false,
-            requestResponders:'',
-            requestVolunteers:'',
-=======
             destinationPlaceId: this.state.destinationPlaceId,
  incidentType: this.state.incidentType,
  incidentLocation: this.state.incidentLocation,
@@ -959,7 +900,6 @@ export default class Responder extends Component {
     isArrivedVolunteer: false,
     isArrivedVolunteerShown: false,
 
->>>>>>> 7cc680a3d2571a6d5f128461013899f984bc2f56
         }).then((snap) => {
             const incidentUserKey = snap.key
             this.setState({ incidentUserKey })

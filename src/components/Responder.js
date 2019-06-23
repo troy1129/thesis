@@ -585,7 +585,7 @@ export default class Responder extends Component {
                     //RESPONDER WHO SENT REPORT SETTLES REPORT
                     else if (incidentID !== "" && responderResponding === userId && isSettled === true) {
                         console.log("ARGUMENT 6");
-                        that.setState({isIncidentReady: false, incidentType, incidentLocation, destinationPlaceId, incidentId: incidentID, userId,markerLat:null,markerLng:null});
+                        that.setState({isSettled:true,isIncidentReady: false, incidentType, incidentLocation, destinationPlaceId, incidentId: incidentID, userId,markerLat:null,markerLng:null});
                         Alert.alert(
                             "INCIDENT HAS BEEN SETTLED43",
                             `Incident Type: ${incidentType}

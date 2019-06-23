@@ -1,0 +1,83 @@
+{
+  "project_info": {
+    "project_number": "583480520859",
+    "firebase_url": "https://emergencyresponsesystem-57dc4.firebaseio.com",
+    "project_id": "emergencyresponsesystem-57dc4",
+    "storage_bucket": "emergencyresponsesystem-57dc4.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:583480520859:android:f960e792c32cd792",
+        "android_client_info": {
+          "package_name": "com.notiftest"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "583480520859-hj9i6khk269v9cdnf4mdjf6a1jv3nkpv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCqLpHHDtmIJMaR0bOiEUefDFnHrMEDOk4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "583480520859-hj9i6khk269v9cdnf4mdjf6a1jv3nkpv.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "583480520859-u659jv1dbln5r6fgnrst0hotr904dgua.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.thesis.iosmob"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:583480520859:android:c6ae6d6ae0abcd08",
+        "android_client_info": {
+          "package_name": "com.thesisappreact"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "583480520859-hj9i6khk269v9cdnf4mdjf6a1jv3nkpv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCqLpHHDtmIJMaR0bOiEUefDFnHrMEDOk4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "583480520859-hj9i6khk269v9cdnf4mdjf6a1jv3nkpv.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "583480520859-u659jv1dbln5r6fgnrst0hotr904dgua.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.thesis.iosmob"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

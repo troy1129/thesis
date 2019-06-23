@@ -39,6 +39,32 @@ export default class RegularUser extends Component {
         super(props);
         this.getImage = this.getImage.bind(this)
         this.state = {
+
+            //IncidentReport
+            coordinates: {
+                lng: null,
+                lat: null
+            },
+            destinationPlaceId: '',
+            image_uri:this.state.image_uri,
+            incidentLocation: this.state.incidentLocation,
+            incidentNote:this.state.incidentNote,
+            incidentType: this.state.incidentType,
+            isRedundantReport:false, //For identifying redundant reports
+            isRequestingResponders:false, //Flag for responder to request additional responders
+            isRequestingVolunteers:false, //Flag for responder to request additional volunteers
+            isRespondingResponder:false, //Flag if naa naka respond nga responder
+            isRespondingVolunteer:false, //Flag if naa naka respond nga volunteer
+            isSettled:false, //If na settle ang report
+            isShownRespResp:false, //If naka click 'Respond' ang responder
+            isShownRespVol:false, //If naka click 'Accept' or 'Reject' ang volunteer
+            isShownSettled: false, //If naka 'Ok' ang responder
+            markerLat:this.state.markerLat,
+            markerLng:this.state.markerLng,
+            reporterName: fullName, 
+            reporterUID: this.state.userId,
+            unresponded:true //Flag if incident is unresponded or not
+
             isModalVisible: false,
             hasResponderAlerted: false,
             hasVolunteerAlerted: false,
@@ -55,7 +81,6 @@ export default class RegularUser extends Component {
             unresponded: true,
             pinFinal:false,
             incidentNote:'',
-            isResponding: false,
             isSettled: false,
             incidentID: '',
             isImageViewVisible: false,
@@ -66,11 +91,7 @@ export default class RegularUser extends Component {
             incidentUserKey: '',
             reportedBy: '',
             timeReceived: '',
-            timeResponded: '',
-            responderResponding: '',
-            volunteerResponding: '',
             userId: '',
-            destinationPlaceId: '',
             responderLat: null,
             responderLng: null,
             volunteerLat: null,
@@ -78,10 +99,7 @@ export default class RegularUser extends Component {
             isRequestingResponders: false,
             isRequestingVolunteers: false,
             responderRespondingID: '',
-            coordinates: {
-                lng: null,
-                lat: null
-            },
+            
             markerCoords: {
                 lng: null,
                 lat: null
@@ -602,32 +620,29 @@ export default class RegularUser extends Component {
         var coordLat = coords2.latitude;
         var coordLng = coords2.longitude;
         app.database().ref("/incidents").push({
-            incidentType: this.state.incidentType,
-            incidentLocation: this.state.incidentLocation,
-            incidentNote:this.state.incidentNote,
-            unresponded: true,
-            isResponding: false,
-            isShown: false,
-            isSettled: false,
-            markerLat:this.state.markerLat,
-            markerLng:this.state.markerLng,
-            reportedBy: this.state.userId,
-            reporterName: fullName,
-            timeReceived: date1,
-            timeResponded: '',
-            image_uri: this.state.image_uri,
-            responderResponding: '',
-            volunteerResponding: '',
             coordinates: {
                 lat: coordLat,
                 lng: coordLng
             },
             destinationPlaceId: this.state.destinationPlaceId,
-            isRequestingResponders: false,
-            isRequestingVolunteers: false,
-            originalVolunteerName:'',
-            requestResponders:'',
-            requestVolunteers:'',
+            image_uri:this.state.image_uri,
+            incidentLocation: this.state.incidentLocation,
+            incidentNote:this.state.incidentNote,
+            incidentType: this.state.incidentType,
+            isRedundantReport:false, //For identifying redundant reports
+            isRequestingResponders:false, //Flag for responder to request additional responders
+            isRequestingVolunteers:false, //Flag for responder to request additional volunteers
+            isRespondingResponder:false, //Flag if naa naka respond nga responder
+            isRespondingVolunteer:false, //Flag if naa naka respond nga volunteer
+            isSettled:false, //If na settle ang report
+            isShownRespResp:false, //If naka click 'Respond' ang responder
+            isShownRespVol:false, //If naka click 'Accept' or 'Reject' ang volunteer
+            isShownSettled: false, //If naka 'Ok' ang responder
+            markerLat:this.state.markerLat,
+            markerLng:this.state.markerLng,
+            reporterName: fullName, 
+            reporterUID: this.state.userId,
+            unresponded:true //Flag if incident is unresponded or not
 
 
         }).then((snap) => {
@@ -639,14 +654,10 @@ export default class RegularUser extends Component {
             incidentType: '',
             incidentLocation: '',
             unresponded: null,
-            isResponding: null,
             isSettled: null,
             image_uri: '',
             reportedBy: '',
             timeReceived: '',
-            timeResponded: '',
-            responderResponding: '',
-            volunteerResponding: '',
             coordinates: {
                 lat: null,
                 lng: null

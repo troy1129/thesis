@@ -39,67 +39,54 @@ export default class RegularUser extends Component {
         super(props);
         this.getImage = this.getImage.bind(this)
         this.state = {
-
-            //IncidentReport
             coordinates: {
-                lng: null,
-                lat: null
+                lat: '',
+                lng: ''
             },
-            destinationPlaceId: '',
-            image_uri:this.state.image_uri,
-            incidentLocation: this.state.incidentLocation,
-            incidentNote:this.state.incidentNote,
-            incidentType: this.state.incidentType,
-            isRedundantReport:false, //For identifying redundant reports
-            isRequestingResponders:false, //Flag for responder to request additional responders
-            isRequestingVolunteers:false, //Flag for responder to request additional volunteers
-            isRespondingResponder:false, //Flag if naa naka respond nga responder
-            isRespondingVolunteer:false, //Flag if naa naka respond nga volunteer
-            isSettled:false, //If na settle ang report
-            isShownRespResp:false, //If naka click 'Respond' ang responder
-            isShownRespVol:false, //If naka click 'Accept' or 'Reject' ang volunteer
-            isShownSettled: false, //If naka 'Ok' ang responder
-            markerLat:this.state.markerLat,
-            markerLng:this.state.markerLng,
-            reporterName: fullName, 
-            reporterUID: this.state.userId,
-            unresponded:true //Flag if incident is unresponded or not
+            destinationPlaceId:'',
+            image_uri:'',
+            incidentLocation: '',
+            incidentNote: '',
+            incidentType:  "Vehicular Accident",
+            isRedundantReport:false, 
+            isRequestingResponders:false, 
+            isRequestingVolunteers:false, 
+            isRespondingResponder:false, 
+            isRespondingVolunteer:false, 
+            isSettled:false, 
+            isShownRespResp:false, 
+            isShownRespVol:false, 
+            isShownSettled: false, 
+            markerLat:null,
+            markerLng:null,
+            reporterName: '', 
+            reporterUID: '',
+            timeReceived: '',
+            unresponded:true,
 
             isModalVisible: false,
             hasResponderAlerted: false,
             hasVolunteerAlerted: false,
             userKey: "",
             userType: '',
-            incidentType: "Vehicular Accident",
-            incidentLocation: "",
             firstName: "",
             lastName: "",
             user: null,
-            markerLat: null,
             isIncidentReady: false,
-            markerLng: null,
-            unresponded: true,
             pinFinal:false,
-            incidentNote:'',
-            isSettled: false,
             incidentID: '',
             isImageViewVisible: false,
             imageIndex: '',
-            image_uri: '',
             uploading: false,
             progress: 0,
             incidentUserKey: '',
-            reportedBy: '',
-            timeReceived: '',
             userId: '',
             responderLat: null,
             responderLng: null,
             volunteerLat: null,
             volunteerLng: null,
-            isRequestingResponders: false,
-            isRequestingVolunteers: false,
             responderRespondingID: '',
-            
+        
             markerCoords: {
                 lng: null,
                 lat: null
@@ -415,7 +402,7 @@ export default class RegularUser extends Component {
             console.log("data2222222222222222", data2);
 
             if (data2) {
-                responderRespondingID = data2.responderResponding;
+                responderRespondingID = data2.respondingRes;
                 // var destinationPlaceId = data2.destinationPlaceId;
                 if (responderRespondingID) {
                     if (that.state.hasResponderAlerted === false) {
@@ -466,7 +453,7 @@ export default class RegularUser extends Component {
             console.log("data333333", data2);
 
             if (data2) {
-                volunteerRespondingID = data2.volunteerResponding;
+                volunteerRespondingID = data2.respondingVol;
 
                 if (volunteerRespondingID) {
                     if (hasVolunteerAlerted === false) {
@@ -624,27 +611,37 @@ export default class RegularUser extends Component {
                 lat: coordLat,
                 lng: coordLng
             },
-            destinationPlaceId: this.state.destinationPlaceId,
+            destinationPlaceId:this.state.destinationPlaceId,
             image_uri:this.state.image_uri,
             incidentLocation: this.state.incidentLocation,
             incidentNote:this.state.incidentNote,
             incidentType: this.state.incidentType,
+            isResponding:true,
             isRedundantReport:false, //For identifying redundant reports
             isRequestingResponders:false, //Flag for responder to request additional responders
             isRequestingVolunteers:false, //Flag for responder to request additional volunteers
-            isRespondingResponder:false, //Flag if naa naka respond nga responder
+            isRespondingResponder:true, //Flag if naa naka respond nga responder
             isRespondingVolunteer:false, //Flag if naa naka respond nga volunteer
-            isSettled:false, //If na settle ang report
-            isShownRespResp:false, //If naka click 'Respond' ang responder
-            isShownRespVol:false, //If naka click 'Accept' or 'Reject' ang volunteer
-            isShownSettled: false, //If naka 'Ok' ang responder
+            isRespondingResponderShown:false, //If naka click 'Respond' ang responder
+            isRespondingVolunteerShown:false, //If naka click 'Accept' or 'Reject' ang volunteer
+            isShownRespAddArrived:false, //If naka click 'OK' sa arrival ang additional responder
+            isShownRespAddReceived:false, //If naka click 'OK' sa received ang additional responder
+            isShownRespArrived:false, //If naka click 'OK' sa arrival ang responder
+            isShownSettled: false, //If naka 'Ok' sa settle alert
             markerLat:this.state.markerLat,
             markerLng:this.state.markerLng,
+            timeReceived:date,
             reporterName: fullName, 
             reporterUID: this.state.userId,
-            unresponded:true //Flag if incident is unresponded or not
-
-
+            respondingRes:'', //responderResponding,
+            respondingResName: fullName,
+            respondingResArrived:'',
+            respondingResReceived:'', //TimeResponderResponded
+            respondingVol:'', //volunteerResponding
+            respondingVolName:'',
+            respondingVolArrived:'',
+            respondingVolReceived:'',
+            unresponded:false //Flag if incident is unresponded or not
         }).then((snap) => {
             const incidentUserKey = snap.key;
             this.setState({ incidentUserKey });
@@ -656,7 +653,6 @@ export default class RegularUser extends Component {
             unresponded: null,
             isSettled: null,
             image_uri: '',
-            reportedBy: '',
             timeReceived: '',
             coordinates: {
                 lat: null,

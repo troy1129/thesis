@@ -265,7 +265,7 @@ export default class Volunteer extends Component {
         var volunteerListen = app.database().ref(`mobileUsers/Volunteer/${userId}`);
         app.database().ref(`users/${this.state.userId}`).update({
             incidentId: '',
-            isAccepted:false,
+            isAccepted: false,
         });
         volunteerListen.update({
             incidentID: '',

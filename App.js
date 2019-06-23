@@ -208,8 +208,6 @@ export default class App extends Component {
         break;
       case 'Responder':
           Actions.Responder()
-          
-          
         // console.log('Responder');
         // browserHistory.push('/ccpersonnel');
         break;

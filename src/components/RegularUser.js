@@ -316,6 +316,7 @@ export default class RegularUser extends Component {
 
  if (incidentID !== "") {
  console.log("hey i got here");
+ 
  this.incidentIDListen = app.database().ref(`incidents/${incidentID}`);
  this.incidentIDListen.on('value', (snapshot) => {
  incidentDetails = snapshot.val() || null;
@@ -323,13 +324,20 @@ export default class RegularUser extends Component {
  var markerLat = incidentDetails.coordinates.lat;
  var markerLng = incidentDetails.coordinates.lng;
  console.log("COORDINATES", markerLat, markerLng);
- var reportedBy = incidentDetails.reportedBy;
+ var reportedBy = incidentDetails.reporterUID;
  var isSettled = incidentDetails.isSettled;
  var incidentType = incidentDetails.incidentType;
  var incidentLocation = incidentDetails.incidentLocation;
  var destinationPlaceId = incidentDetails.destinationPlaceId;
  console.log("DESTINATION PLACE", destinationPlaceId);
  var incidentLocation = incidentDetails.incidentLocation;
+
+//  if(incidentDetails !== null && isSettled){
+//     that.setState({isIncidentReady:true});
+//     that.setState({ markerLat, markerLng, isSettled: false, incidentType, incidentLocation, isIncidentReady: true, image_uri });
+//     that.getRouteDirection(destinationPlaceId, incidentLocation);
+//  }
+
  if (reportedBy === userId && isSettled === false) {
 
  that.incidentResponderListener(incidentID);
@@ -364,7 +372,7 @@ export default class RegularUser extends Component {
  incidentSettled = () => {
 
 
- this.setState({ isSettled: true, isIncidentReady: false, hasResponderAlerted: false, hasVolunteerAlerted: false ,incidentLocation:'',pinUpdate:false, incidentID:''});
+ this.setState({isIncidentReady: false, hasResponderAlerted: false, hasVolunteerAlerted: false ,incidentLocation:'',pinUpdate:false, incidentID:''});
  this.setState({ markerCoords: null });
 
  Alert.alert(
@@ -622,6 +630,9 @@ export default class RegularUser extends Component {
 
  isRespondingResponderShown:false,
  isRespondingVolunteerShown:false,
+
+ isRespondingResponder:false,
+ isRespondingVolunteer: false,
 
  isRespondingAddResponderShown: false,
  isRespondingAddVolunteerShown: false,

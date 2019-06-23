@@ -829,6 +829,9 @@ export default class Responder extends Component {
            
             isRequestingResponders: false,
             isRequestingVolunteers: false,
+
+            isRespondingResponder:true,
+            isRespondingVolunteer: false,
            
             isRespondingResponderShown:true,
             isRespondingVolunteerShown:false,

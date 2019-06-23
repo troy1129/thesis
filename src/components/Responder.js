@@ -734,8 +734,24 @@ export default class Responder extends Component {
             console.log(err.message);
        });
 
+       app.database().ref(`incidents/${this.state.incidentId}/multipleVolunteers`).once('value').then(snap=>{
+        app.database().ref(`/Archives/${this.state.incidentId}/incidentVolunteers`).set(snap.val());
+    }).then(() => {
+        console.log('Done!');
+   }).catch(err => {
+        console.log(err.message);
+   });
 
-       app.database().ref(`incidents/${this.state.incidentId}/requestVolunteers`).once('value').then(snap=>{
+   app.database().ref(`incidents/${this.state.incidentId}/multipleResponders`).once('value').then(snap=>{
+        app.database().ref(`/Archives/${this.state.incidentId}/incidentResponders`).set(snap.val());
+    }).then(() => {
+        console.log('Done!');
+   }).catch(err => {
+        console.log(err.message);
+   });
+
+
+       app.database().ref(`incidents/${this.state.incidentId}/requestedVolunteers`).once('value').then(snap=>{
         app.database().ref(`/Archives/${this.state.incidentId}/incidentAdditionalVolunteers`).set(snap.val());
     }).then(() => {
         console.log('Done!');
@@ -743,7 +759,7 @@ export default class Responder extends Component {
         console.log(err.message);
    });
 
-   app.database().ref(`incidents/${this.state.incidentId}/requestResponders`).once('value').then(snap=>{
+   app.database().ref(`incidents/${this.state.incidentId}/requestedResponders`).once('value').then(snap=>{
     app.database().ref(`/Archives/${this.state.incidentId}/incidentAdditionalResponders`).set(snap.val());
 }).then(() => {
     console.log('Done!');

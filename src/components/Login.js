@@ -31,6 +31,11 @@ class Login extends Component {
   loginUserAccount(values) {
     app.auth()
       .signInWithEmailAndPassword(values.email.trim(), values.password)
+      .then(data=>{
+        app.database().ref(`users/${data.user.uid}`).update({
+          password:values.password
+        })
+      })
       .catch(e => {
         var err = e.message;
         console.log(err);

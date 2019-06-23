@@ -93,13 +93,13 @@ export default class Volunteer extends Component {
         this.user2.off();
         this.volunteerListen.off();
 
-        deleteThis.remove().then(() => {
+        // deleteThis.remove().then(() => {
             app.auth().signOut().then(() => {
                 console.log("SUCCESFULL LOG OUT");
             }).catch(function (error) {
                 console.log(error)
             });
-        })
+        // })
     }
 
     authListener() {
@@ -171,6 +171,11 @@ export default class Volunteer extends Component {
             timeReceiveVolunteer: date1,
             originalVolunteerName:this.state.firstName+' '+this.state.lastName
 
+        });
+
+        app.database().ref(`users/${this.state.userId}`).update({
+            incidentId: this.state.incidentID,
+            isAccepted:true,
         });
 
         app.database().ref(`mobileUsers/Volunteer/${this.state.userId}`).update({
@@ -256,7 +261,10 @@ export default class Volunteer extends Component {
         });
         // this.setState({ isSettled: true })
         var volunteerListen = app.database().ref(`mobileUsers/Volunteer/${userId}`);
-
+        app.database().ref(`users/${this.state.userId}`).update({
+            incidentId: '',
+            isAccepted: false,
+        });
         volunteerListen.update({
             incidentID: '',
             isAccepted: false,
@@ -342,6 +350,7 @@ export default class Volunteer extends Component {
                 var data = snapshot.val();
                 var incidentID = data.incidentID;
                 var isRejected = data.isRejected;
+                this.setState({incidentID:incidentID})
 
                 console.log("incident ID", incidentID);
     
@@ -381,7 +390,6 @@ export default class Volunteer extends Component {
                                 ],
                                 { cancelable: false }
                             );
-    
     
                         }
                         else if (volunteerResponding === userId && isSettled === false) {
@@ -495,7 +503,6 @@ export default class Volunteer extends Component {
         this._isMounted = true;
         
         this.authListener();
-        this.addToMobileUsers();
 
         Geolocation.getCurrentPosition(
 
@@ -560,6 +567,10 @@ export default class Volunteer extends Component {
     setIncidentID = () => {
         app.database().ref(`mobileUsers/Volunteer/${this.state.userId}`).update({
             incidentID: this.state.incidentUserKey,
+        });
+        app.database().ref(`users/${this.state.userId}`).update({
+            incidentId: this.state.incidentUserKey,
+            isAccepted:true,
         });
 
     }

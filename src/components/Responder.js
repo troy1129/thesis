@@ -82,7 +82,8 @@ export default class Responder extends Component {
             user: null,
             profilePhoto:'',
             unresponded: true,
-            respondingVolName:'',
+            originalVolunteerName:'',
+            originalResponderName:'',
             isResponding: false,
             isSettled: false,
             modalVisible:null,
@@ -132,7 +133,7 @@ export default class Responder extends Component {
     addToMobileUsers = () => {
         let user = app.auth().currentUser;
         var addThis = app.database().ref(`mobileUsers/Responder/${user.uid}`)
-        addThis.update({
+        app.database().ref(`mobileUsers/Responder/${user.uid}`).update({
             incidentID:"",
             isAccepted:false,
             });
@@ -266,15 +267,17 @@ export default class Responder extends Component {
             respondingRes: this.state.userId,
             respondingResName: this.state.firstName + ' ' + this.state.lastName,
             image_uri:this.state.image_uri,
-            respondingVolName:this.state.respondingVolName,
-            respondingResReceived:date,
-            unresponded: false,
+            timeReceived: date,
+            originalResponderName:this.state.firstName+' '+this.state.lastName
         });
 
         app.database().ref(`mobileUsers/Responder/${userId}`).update({
             isAccepted: true,
         });
-
+        app.database().ref(`users/${userId}`).update({
+            incidentId: this.state.incidentID,
+            isAccepted:true
+        })
         this.getRouteDirection(destinationPlaceId, incidentLocation);
     }
 
@@ -299,11 +302,10 @@ export default class Responder extends Component {
         let incidentID = this.state.incidentId;
         let userId = this.state.userId;
         console.log("is settled?", incidentID, userId);
-
-        app.database().ref(`incidents/${incidentID}`).update({
-            isShownSettled: true
-        });
-        
+        app.database().ref(`users/${userId}`).update({
+            incidentId:'',
+            isAccepted:false,
+        })
         var responderListen = app.database().ref(`mobileUsers/Responder/${userId}`)
         responderListen.update({
             incidentID: '',
@@ -342,7 +344,10 @@ export default class Responder extends Component {
             isSettled: true,
             timeSettled: date
         });
+     
     }
+
+
 
 
     arrivedLocationRequested = () => {
@@ -497,7 +502,8 @@ export default class Responder extends Component {
                     incidentDetails = snapshot.val() || null;
                     var incidentType = incidentDetails.incidentType;
                     var incidentLocation = incidentDetails.incidentLocation;
-                    var respondingVolName=incidentDetails.respondingVolName;
+                    var originalVolunteerName=incidentDetails.originalVolunteerName;
+                    var originalResponderName=incidentDetails.originalResponderName;
                     var image_uri = incidentDetails.image_uri;
                     var incidentNote=incidentDetails.incidentNote;
                     var markerLat = incidentDetails.coordinates.lat;
@@ -516,18 +522,18 @@ export default class Responder extends Component {
                                                  Incident Location: ${incidentLocation}`
                             ,
                             [
-                                { text: "Respond", onPress: () => { that.changeIncidentState(incidentType, incidentLocation, incidentID, destinationPlaceId, userId, image_uri,markerLat,markerLng,incidentNote,respondingVolName) } },
+                                { text: "Respond", onPress: () => { that.changeIncidentState(incidentType, incidentLocation, incidentID, destinationPlaceId, userId, image_uri,markerLat,markerLng,incidentNote,originalVolunteerName,originalResponderName) } },
                             ],
                             { cancelable: false }
                         );
-                        that.setState({ originalResponder: true, isIncidentReady: true, incidentType, incidentLocation, destinationPlaceId, userId, incidentId: incidentID, image_uri,markerLat,markerLng,incidentNote,respondingVolName });
+                        that.setState({ originalResponder: true, isIncidentReady: true, incidentType, incidentLocation, destinationPlaceId, userId, incidentId: incidentID, image_uri,markerLat,markerLng,incidentNote,originalVolunteerName,originalResponderName });
                     }
                     //SAME RESPONDER SENT REPORT, ORIGINAL RESPONDER
                     else if (incidentID !== "" && respondingRes === userId && isSettled === false) {
                         console.log("ARGUMENT 2");
                         console.log("same responder");
 
-                        that.setState({ originalResponder: true, isIncidentReady: true, incidentType, incidentLocation, destinationPlaceId, userId, incidentId: incidentID, isSettled: false, image_uri ,markerLat,markerLng,incidentNote,respondingVolName});
+                        that.setState({ originalResponder: true, isIncidentReady: true, incidentType, incidentLocation, destinationPlaceId, userId, incidentId: incidentID, isSettled: false, image_uri ,markerLat,markerLng,incidentNote,originalVolunteerName,originalResponderName});
                         that.getRouteDirection(destinationPlaceId, incidentLocation);
                     }
 
@@ -551,7 +557,7 @@ export default class Responder extends Component {
                     //RESPONDER WHO SENT REPORT SETTLES REPORT
                     else if (incidentID !== "" && respondingRes === userId && isSettled === true) {
                         console.log("ARGUMENT 6");
-                        that.setState({ isIncidentReady: false, incidentType, incidentLocation, destinationPlaceId, incidentId: incidentID, userId,markerLat:null,markerLng:null});
+                        that.setState({isIncidentReady: false, incidentType, incidentLocation, destinationPlaceId, incidentId: incidentID, userId,markerLat:null,markerLng:null});
                         Alert.alert(
                             "INCIDENT HAS BEEN SETTLED43",
                             `Incident Type: ${incidentType}
@@ -652,8 +658,8 @@ export default class Responder extends Component {
 
     componentDidMount() {
         this._isMounted = true;
-        this.authListener();
-        this.addToMobileUsers();
+        this.authListener()
+       
 
         Geolocation.getCurrentPosition(
 
@@ -707,7 +713,9 @@ export default class Responder extends Component {
             feedbackReport:this.state.incidentFeedback,
             feedbackTimeSettled:time,
             incidentType:this.state.incidentType,
-            incidentOriginalVolunteer: this.state.respondingVolName,
+            incidentOriginalVolunteer: this.state.originalVolunteerName,
+            incidentOriginalResponder:this.state.originalResponderName,
+            
         });
 
         app.database().ref(`incidents/${this.state.incidentId}/incidentLocation`).once('value').then(snap=>{
@@ -770,8 +778,8 @@ export default class Responder extends Component {
 
     this.setState({incidentLocation:''})
     this.setState({
+        isSettled:false,
         isArrived: false,
-        isSettled: false,
         dispatchedResponder: false,
         isIncidentReady: false,
         originalResponder: false,
@@ -788,7 +796,6 @@ export default class Responder extends Component {
         Geolocation.clearWatch(this.watchId);
         this.fireBaseListener && this.fireBaseListener();
         this.user2 = app.database().ref(`users/${this.state.userId}/`);
-        this.responderListen = app.database().ref(`mobileUsers/Responder/${this.state.userId}`);
         this.userIncidentId = app.database().ref(`incidents/${this.state.incidentID}`);
         this.user2.off()
         this.responderListen.off()
@@ -810,6 +817,23 @@ export default class Responder extends Component {
         var coordLat = coords2.latitude;
         var coordLng = coords2.longitude;
         app.database().ref("/incidents").push({
+            reporterName: fullName,
+            incidentType: this.state.incidentType,
+            incidentLocation: this.state.incidentLocation,
+            unresponded: true,
+            isResponding: false,
+            markerLat:this.state.markerLat,
+            markerLng:this.state.markerLng,
+            isSettled: false,
+            incidentNote:this.state.incidentNote,
+            originalVolunteerName:this.state.originalVolunteerName,
+            image_uri:this.state.image_uri,
+            reportedBy: this.state.firstName+' '+this.state.lastName,
+            timeReceived: date,
+            timeResponderResponded: '',
+            responderResponding: this.state.userId,
+            originalResponderName:this.state.firstName+' '+this.state.lastName,
+            volunteerResponding: '',
             coordinates: {
                 lat: coordLat,
                 lng: coordLng
@@ -900,7 +924,10 @@ export default class Responder extends Component {
             incidentID: this.state.incidentUserKey,
             isAccepted:true,
         });
-
+        app.database().ref(`users/${this.state.userId}`).update({
+            incidentId: this.state.incidentUserKey,
+            isAccepted:false,
+        });
     }
 
     async getRouteDirection(destinationPlaceId, destinationName) {
@@ -940,7 +967,7 @@ export default class Responder extends Component {
         this.setState({ isModalVisible: !this.state.isModalVisible });
     }
     _toggleModal2 = () => {
-        this.setState({ isFeedbackVisible: !this.state.isFeedbackVisible, isSettled:false, didSettle:false});
+        this.setState({ isFeedbackVisible: !this.state.isFeedbackVisible });
     }
 
     _openDrawer = () => {
@@ -1017,6 +1044,7 @@ export default class Responder extends Component {
                                 </View> :
                             this.state.dispatchedResponder === false ?
                                 <View style={styles.buttonContainer}>
+                                    <Text>{this.state.ETA}</Text>
                                     <AwesomeButton height={30} width={120} backgroundColor="#467541" 
                                     onPress={this.arrivedLocation}>
                                         I have arrived! 
@@ -1160,6 +1188,11 @@ export default class Responder extends Component {
             <MapViewDirections
             origin={{latitude: this.state.latitude, longitude: this.state.longitude}}
             destination={{latitude: this.state.markerLat, longitude: this.state.markerLng}}
+             onReady={result => {
+              console.log(`Distance: ${result.distance} km`)
+              this.setState({ETA:result.duration})
+              console.log(`Duration: ${result.duration} min.`)
+            }}
             apikey={apiKey}
             strokeWidth={3}
             strokeColor="hotpink"

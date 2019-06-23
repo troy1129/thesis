@@ -703,14 +703,7 @@ class Register extends Component {
                     </Text>
 
                         </TouchableOpacity> */}
-                        <TouchableOpacity style={styles.button}
-                            onPress={this.getImage}>
-
-                            <Text style={styles.buttonText}>
-                                Set Profile Picture
-                    </Text>
-
-                        </TouchableOpacity>
+                     
                         <TouchableOpacity style={styles.button}
 
                             onPress={() => { Actions.Login() }}>

@@ -333,7 +333,7 @@ export default class Responder extends Component {
             isAccepted: false,
         }).then(()=>{
             if(this.state.didSettle){
-                this._toggleModal2
+                this._toggleModal2()
             }
         })
 

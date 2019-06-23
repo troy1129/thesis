@@ -372,7 +372,7 @@ export default class RegularUser extends Component {
  incidentSettled = () => {
 
 
- this.setState({isIncidentReady: false, hasResponderAlerted: false, hasVolunteerAlerted: false ,incidentLocation:'',pinUpdate:false, incidentID:''});
+ this.setState({ isSettled: true, isIncidentReady: false, hasResponderAlerted: false, hasVolunteerAlerted: false ,incidentLocation:'',pinUpdate:false, incidentID:''});
  this.setState({ markerCoords: null });
 
  Alert.alert(

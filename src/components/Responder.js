@@ -264,6 +264,7 @@ export default class Responder extends Component {
             isRespondingResponderShown:true,
             unrespondedResponder: false,
             respondingRes: this.state.userId,
+            respondingResName: this.state.firstName + ' ' + this.state.lastName,
             image_uri:this.state.image_uri,
             respondingVolName:this.state.respondingVolName,
             respondingResReceived:date,
@@ -314,31 +315,6 @@ export default class Responder extends Component {
         })
 
     }
-
-    // clearSettledAdditional = () => {
-
-    //     let incidentID = this.state.incidentId;
-    //     let userId = this.state.userId;
-    //     console.log("is settled?", incidentID, userId);
-
-    //     this.setState({
-    //         isSettled: false,
-    //         dispatchedResponder: false,
-    //         isIncidentReady: false,
-    //         originalResponder: false,
-    //         isRequestingResponders: false,
-    //         requestResponders: false,
-    //         incidentId: "",
-    //         isAccepted: false,
-    //        pinUpdate:false
-
-    //     })
-    //     var responderListen = app.database().ref(`mobileUsers/Responder/${userId}`)
-    //     responderListen.update({
-    //         incidentID: '',
-    //         isAccepted: false,
-    //     })
-    // }
 
     isSettled = () => {
 
@@ -849,7 +825,7 @@ export default class Responder extends Component {
             isRequestingVolunteers:false, //Flag for responder to request additional volunteers
             isRespondingResponder:true, //Flag if naa naka respond nga responder
             isRespondingVolunteer:false, //Flag if naa naka respond nga volunteer
-            isRespondingResponderShown:false, //If naka click 'Respond' ang responder
+            isRespondingResponderShown:true, //If naka click 'Respond' ang responder
             isRespondingVolunteerShown:false, //If naka click 'Accept' or 'Reject' ang volunteer
             isShownRespAddArrived:false, //If naka click 'OK' sa arrival ang additional responder
             isShownRespAddReceived:false, //If naka click 'OK' sa received ang additional responder
@@ -860,10 +836,10 @@ export default class Responder extends Component {
             timeReceived:date,
             reporterName: fullName, 
             reporterUID: this.state.userId,
-            respondingRes:'', //responderResponding,
+            respondingRes:this.state.userId, //responderResponding,
             respondingResName: fullName,
             respondingResArrived:'',
-            respondingResReceived:'', //TimeResponderResponded
+            respondingResReceived:date, //TimeResponderResponded
             respondingVol:'', //volunteerResponding
             respondingVolName:'',
             respondingVolArrived:'',

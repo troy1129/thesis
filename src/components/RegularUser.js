@@ -323,6 +323,8 @@ export default class RegularUser extends Component {
 
             if (incidentID !== "") {
                 console.log("hey i got here");
+                that.setState({isIncidentReady: true})
+
                 this.incidentIDListen = app.database().ref(`incidents/${incidentID}`);
                 this.incidentIDListen.on('value', (snapshot) => {
                     incidentDetails = snapshot.val() || null;
@@ -330,7 +332,7 @@ export default class RegularUser extends Component {
                     var markerLat = incidentDetails.coordinates.lat;
                     var markerLng = incidentDetails.coordinates.lng;
                     console.log("COORDINATES", markerLat, markerLng);
-                    var reportedBy = incidentDetails.reportedBy;
+                    var reportedBy = incidentDetails.reporterName;
                     var isSettled = incidentDetails.isSettled;
                     var incidentType = incidentDetails.incidentType;
                     var incidentLocation = incidentDetails.incidentLocation;
@@ -600,7 +602,7 @@ export default class RegularUser extends Component {
         var date = Date(Date.now());
         var fullName = this.state.firstName+' '+this.state.lastName;
         date1 = date.toString();
-        this.setState({pinFinal:true,isModalVisible: !this.state.isModalVisible,
+        this.setState({isIncidentReady: true,pinFinal:true,isModalVisible: !this.state.isModalVisible,
         })
         var coords = this.state.pointCoords;
         var coords2 = this.state.pointCoords[coords.length - 1];
@@ -616,11 +618,11 @@ export default class RegularUser extends Component {
             incidentLocation: this.state.incidentLocation,
             incidentNote:this.state.incidentNote,
             incidentType: this.state.incidentType,
-            isResponding:true,
+            isResponding:false,
             isRedundantReport:false, //For identifying redundant reports
             isRequestingResponders:false, //Flag for responder to request additional responders
             isRequestingVolunteers:false, //Flag for responder to request additional volunteers
-            isRespondingResponder:true, //Flag if naa naka respond nga responder
+            isRespondingResponder:false, //Flag if naa naka respond nga responder
             isRespondingVolunteer:false, //Flag if naa naka respond nga volunteer
             isRespondingResponderShown:false, //If naka click 'Respond' ang responder
             isRespondingVolunteerShown:false, //If naka click 'Accept' or 'Reject' ang volunteer
@@ -647,27 +649,26 @@ export default class RegularUser extends Component {
             this.setState({ incidentUserKey });
             console.log("INCIDENT USER KEY HEREEEEE: ", this.state.userId);
         })
-        this.setState({
-            incidentType: '',
-            incidentLocation: '',
-            unresponded: null,
-            isSettled: null,
-            image_uri: '',
-            timeReceived: '',
-            coordinates: {
-                lat: null,
-                lng: null
-            },
-            markerCoords: {
-                lat: null,
-                lng: null
-            },
-            destinationPlaceId: '',
-            isRequestingResponders: false,
-            isRequestingVolunteers: false,
 
-
-        });
+        // this.setState({
+        //     incidentType: '',
+        //     incidentLocation: '',
+        //     unresponded: null,
+        //     isSettled: null,
+        //     image_uri: '',
+        //     timeReceived: '',
+        //     coordinates: {
+        //         lat: null,
+        //         lng: null
+        //     },
+        //     markerCoords: {
+        //         lat: null,
+        //         lng: null
+        //     },
+        //     destinationPlaceId: '',
+        //     isRequestingResponders: false,
+        //     isRequestingVolunteers: false,
+        // });
         console.log(this.state.incidentsList);
         Alert.alert(
             'Attention: ',
